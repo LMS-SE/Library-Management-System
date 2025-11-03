@@ -1,11 +1,10 @@
 package edu.software.lms;
 
-public enum LoginResult {
-    NO_USER_FOUND,
-    USER_FOUND_WRONG_PASSWORD,
-    USER_FOUND_SUCCESSFULLY,
+public enum SignUpResult {
     INVALID_PASSWORD,
     INVALID_USERNAME,
     PASSWORD_TOO_SHORT,
     PASSWORD_WEAK,
+    USER_CREATED_SUCCESSFULLY,
+    USER_CREATION_FAILED,
 }
