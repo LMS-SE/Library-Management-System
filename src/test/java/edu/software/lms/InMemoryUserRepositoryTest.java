@@ -58,11 +58,13 @@ class InMemoryUserRepositoryTest {
         User u = new User("dave", "mysecret");
         u.setId("d-id");
         repo.addUser(u);
-        assertEquals(new Pair<>(null,LoginResult.INVALID_USERNAME),repo.validateCredentials(null,"mysecret"));
-        assertEquals(new Pair<>(null,LoginResult.INVALID_PASSWORD),repo.validateCredentials("dave",null));
-        assertEquals(new Pair<>(null,LoginResult.NO_USER_FOUND),repo.validateCredentials("none","123"));
-        assertEquals(new Pair<>(u, LoginResult.USER_FOUND_SUCCESSFULLY),repo.validateCredentials("dave","mysecret"));
-        assertEquals(new Pair<>(null,LoginResult.USER_FOUND_WRONG_PASSWORD),repo.validateCredentials("dave","123"));
+        UserService userService=new UserService();
+        userService.setUserRepository(repo);
+        assertEquals(new Pair<>(null,LoginResult.INVALID_USERNAME),userService.validateCredentials(null,"mysecret"));
+        assertEquals(new Pair<>(null,LoginResult.INVALID_PASSWORD),userService.validateCredentials("dave",null));
+        assertEquals(new Pair<>(null,LoginResult.NO_USER_FOUND),userService.validateCredentials("none","123"));
+        assertEquals(new Pair<>(u, LoginResult.USER_FOUND_SUCCESSFULLY),userService.validateCredentials("dave","mysecret"));
+        assertEquals(new Pair<>(null,LoginResult.USER_FOUND_WRONG_PASSWORD),userService.validateCredentials("dave","123"));
         ;
     }
 }

@@ -1,46 +1,37 @@
 package edu.software.lms;
 
 
-import java.util.Scanner;
-
 public class UserService {
-    private static UserRepository userRepository=new InMemoryUserRepository();;
-    private static BookRepository bookRepository=new InMemoryBooks();
-    static Scanner sc=new Scanner(System.in);
-
-    public User getCurrentUser() {
-        return currentUser;
-    }
-
-    public void setCurrentUser(User currentUser) {
-        this.currentUser = currentUser;
-    }
-
+    private UserRepository userRepository=new InMemoryUserRepository();;
+    private BookRepository bookRepository=new InMemoryBooks();
     private User currentUser;
+
+
     public UserService() {
 
     }
-
-    private LoginResult validateLoginCredentials(String username, String pwd) {
-        if(pwd.equals("0")||username.equals("0")) {
-            return null;
-        }
-        if(pwd.length()<8) {
-            return LoginResult.PASSWORD_TOO_SHORT;
-        }
-        if(!CustomUtilities.isStrongPassword(pwd)) {
-            return LoginResult.PASSWORD_WEAK;
-        }
-        //encrypt password
-        String hashedPwd=CustomUtilities.hashPassword(pwd,username);
-
-        Pair<User,LoginResult> result=userRepository.validateCredentials(username,hashedPwd);
-        currentUser=result.first;
-        return result.second;
+    public UserRepository getUserRepository() {
+        return userRepository;
     }
-    private SignUpResult validateCreateAccountCredentials(String username, String pwd) {
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+    public BookRepository getBookRepository() {
+        return bookRepository;
+    }
+    public void setBookRepository(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
+    public User getCurrentUser() {
+        return currentUser;
+    }
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
+    }
+    public SignUpResult validateCreateAccountCredentials(String username, String pwd) {
+        //todo: I think we have to write test for that...
         if(pwd.equals("0")||username.equals("0")) {
-            return null;
+            return SignUpResult.CANCEL_SIGNUP;
         }
         if(pwd.length()<8) {
             return SignUpResult.PASSWORD_TOO_SHORT;
@@ -58,33 +49,31 @@ public class UserService {
         }
         return SignUpResult.USER_CREATION_FAILED;
     }
+    public LoginResult validateLoginCredentials(String username, String pwd) {
+        //todo: I think we have to write test for that too...
+        if (username.isEmpty()) return LoginResult.INVALID_USERNAME;
+        if (pwd.isEmpty()) return LoginResult.INVALID_PASSWORD;
+        if(pwd.equals("0")||username.equals("0")) {
+            return LoginResult.CANCEL_LOGIN;
+        }
+        //encrypt password
+        String hashedPwd=CustomUtilities.hashPassword(pwd,username);
 
-    public SignUpResult createAccountPrompt() {
+        Pair<User,LoginResult> result = validateCredentials(username,hashedPwd);
+        currentUser=result.first;
+        return result.second;
+    }
+    public Pair<User,LoginResult> validateCredentials(String username, String password) {
+        if (username == null||username.isEmpty()) return new Pair<>(null, LoginResult.INVALID_USERNAME);
+        if (password == null||password.isEmpty()) return new Pair<>(null, LoginResult.INVALID_PASSWORD);
+        User user = userRepository.getUserByUsername(username);
 
-        String username,pwd;
-        System.out.println("==Create Account==");
-        System.out.println("==To Go back type 0 in either the password or the username==");
-        System.out.print("Username : ");
-        username=sc.nextLine();
-        System.out.print("Password : ");
-        pwd=sc.nextLine();
+        if (user == null) return new Pair<>(null, LoginResult.NO_USER_FOUND);
+        if(user.checkPassword(password))
+            return new Pair<>(user,LoginResult.USER_FOUND_SUCCESSFULLY);
+        return new Pair<>(null,LoginResult.USER_FOUND_WRONG_PASSWORD);
 
 
-        return validateCreateAccountCredentials(username, pwd);
     }
 
-    public LoginResult logInPrompt() {
-
-        String username,pwd;
-        System.out.println("==Log In==");
-        System.out.println("==To Go back type 0 in either the password or the username==");
-        System.out.print("Username : ");
-        username=sc.nextLine();
-        System.out.print("Password : ");
-
-        pwd=sc.nextLine();
-
-
-        return validateLoginCredentials(username, pwd);
-    }
 }

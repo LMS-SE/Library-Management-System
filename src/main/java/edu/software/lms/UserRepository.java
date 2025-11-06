@@ -6,8 +6,4 @@ public interface UserRepository {
     User getUserByUsername(String username);
     boolean addUser(User user);
     boolean deleteUser(String id);
-    /**
-     * Validate credentials: returns true if username exists and password matches.
-     */
-    Pair<User,LoginResult> validateCredentials(String username, String password);
 }
