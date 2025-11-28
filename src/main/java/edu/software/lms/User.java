@@ -10,6 +10,7 @@ public class User {
     private String id;
     private int fineBalance; // NIS
     private List<String> loanIds;
+    private boolean isAdmin;//0 : regular user, 1: admin
 
     public User(String username, String password) {
         this.username = username;
