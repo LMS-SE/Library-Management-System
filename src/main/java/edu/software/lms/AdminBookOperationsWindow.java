@@ -8,13 +8,19 @@ public class AdminBookOperationsWindow implements Window {
 
     private final UserService userService;
     private final BookRepository bookRepo;
-    private final BorrowingService borrowingService;
+    private final BorrowingService borrowingService; // الكلاس القديم موجود عندك
+    private final MediaBorrowingService mediaBorrowingService; // الخدمة الجديدة لإدارة أنواع الوسائط (CD/Book)
 
     public AdminBookOperationsWindow(UserService userService) {
         this.userService = userService;
         this.bookRepo = resolveRepoFromUserServiceOrFallback(userService);
         LoanRepository loanRepo = resolveLoanRepoFromUserServiceOrFallback(userService);
+
+        // نهيئ القديم كما كان (لا نغيّر سلوكه)
         this.borrowingService = new BorrowingService(userService.getUserRepository(), bookRepo, loanRepo, new SystemTimeProvider(), new BookFineStrategy());
+
+        // نهيئ الخدمة الجديدة التي تدعم CDs وكتب مع قواعد قرض مختلفة
+        this.mediaBorrowingService = new MediaBorrowingService(userService.getUserRepository(), bookRepo, loanRepo, new SystemTimeProvider());
     }
 
     private BookRepository resolveRepoFromUserServiceOrFallback(UserService userService) {
@@ -41,11 +47,11 @@ public class AdminBookOperationsWindow implements Window {
 
     private void printMenu() {
         System.out.println("Choose an option:");
-        System.out.println("1) Add book");
+        System.out.println("1) Add book / CD");
         System.out.println("2) Search book");
         System.out.println("3) List all books");
-        System.out.println("4) Borrow book");
-        System.out.println("5) Return book");
+        System.out.println("4) Borrow book / CD");
+        System.out.println("5) Return book / CD");
         System.out.println("6) View my loans");
         System.out.println("7) Pay fine");
         System.out.println("back) Log out");
@@ -54,6 +60,10 @@ public class AdminBookOperationsWindow implements Window {
     }
 
     private void addBookFlow() {
+        System.out.print("Is this a CD? (y/N): ");
+        String isCd = scanner.nextLine().trim();
+        boolean cd = isCd.equalsIgnoreCase("y");
+
         System.out.print("Enter title: ");
         String title = scanner.nextLine().trim();
         System.out.print("Enter author: ");
@@ -67,16 +77,19 @@ public class AdminBookOperationsWindow implements Window {
         }
 
         int nextId = computeNextId();
-        Book book = new Book(nextId, title, author, isbn);
+        Book book;
+        if (cd) book = new CD(nextId, title, author, isbn);
+        else book = new Book(nextId, title, author, isbn);
+
         boolean added = bookRepo.addBook(book);
-        if (added) System.out.println("✅ Book added successfully.");
-        else System.out.println("❌ Failed to add book (maybe duplicate id or ISBN).");
+        if (added) System.out.println("✅ Item added successfully.");
+        else System.out.println("❌ Failed to add (maybe duplicate id or ISBN).");
     }
 
     private int computeNextId() {
         int nextId = 1;
         if (bookRepo instanceof InMemoryBooks) {
-            List<Book> list = ((InMemoryBooks) bookRepo).books; // package-private
+            List<Book> list = ((InMemoryBooks) bookRepo).books; // package-private in your code
             if (list != null && !list.isEmpty()) {
                 int max = 0;
                 for (Book b : list) if (b != null) max = Math.max(max, b.getId());
@@ -115,14 +128,15 @@ public class AdminBookOperationsWindow implements Window {
             System.out.println("لا توجد نتيجة.");
             return;
         }
-        System.out.println("ID: " + b.getId() + " | Title: " + b.getName() + " | Author: " + b.getAuthor() + " | ISBN: " + b.getIsbn() + " | Borrowed: " + b.isBorrowed());
+        String type = (b instanceof CD) ? "CD" : "Book";
+        System.out.println("ID: " + b.getId() + " | Type: " + type + " | Title: " + b.getName() + " | Author: " + b.getAuthor() + " | ISBN: " + b.getIsbn() + " | Borrowed: " + b.isBorrowed());
     }
 
     private void listAllBooks() {
         if (bookRepo instanceof InMemoryBooks) {
             List<Book> all = ((InMemoryBooks) bookRepo).books;
             if (all.isEmpty()) {
-                System.out.println("No books available.");
+                System.out.println("No items available.");
             } else {
                 for (Book b : all) printBook(b);
             }
@@ -132,7 +146,7 @@ public class AdminBookOperationsWindow implements Window {
     }
 
     private void borrowFlow() {
-        System.out.print("Enter book ID to borrow: ");
+        System.out.print("Enter item ID to borrow: ");
         String s = scanner.nextLine().trim();
         try {
             int id = Integer.parseInt(s);
@@ -141,7 +155,8 @@ public class AdminBookOperationsWindow implements Window {
                 System.out.println("No user logged in. Go to login first.");
                 return;
             }
-            Pair<Boolean, String> res = borrowingService.borrowBook(u.getUsername(), id);
+            // الآن نستخدم mediaBorrowingService ليطبق قواعد الكتب و الـCDs
+            Pair<Boolean, String> res = mediaBorrowingService.borrowMedia(u.getUsername(), id);
             System.out.println(res.second);
         } catch (NumberFormatException e) {
             System.out.println("Invalid ID.");
@@ -151,7 +166,8 @@ public class AdminBookOperationsWindow implements Window {
     private void returnFlow() {
         System.out.print("Enter loan ID to return: ");
         String loanId = scanner.nextLine().trim();
-        Pair<Boolean, String> res = borrowingService.returnBook(loanId);
+        // نستخدم mediaBorrowingService لإرجاع لأنّه يعرف نوع الوسيط
+        Pair<Boolean, String> res = mediaBorrowingService.returnMedia(loanId);
         System.out.println(res.second);
     }
 
@@ -167,7 +183,8 @@ public class AdminBookOperationsWindow implements Window {
             return;
         }
         for (Loan l : loans) {
-            System.out.println("LoanId: " + l.getId() + " | BookId: " + l.getBookId() + " | Borrowed: " + l.getBorrowDate()
+            String type = (l instanceof MediaLoan) ? ((MediaLoan) l).getMediaType().toString() : "BOOK";
+            System.out.println("LoanId: " + l.getId() + " | ItemId: " + l.getBookId() + " | Type: " + type + " | Borrowed: " + l.getBorrowDate()
                     + " | Due: " + l.getDueDate() + " | Returned: " + (l.isReturned() ? l.getReturnedDate() : "NO"));
         }
     }
@@ -180,6 +197,7 @@ public class AdminBookOperationsWindow implements Window {
         String s = scanner.nextLine().trim();
         try {
             int amt = Integer.parseInt(s);
+            // نستخدم borrowingService.payFine لأنّه موجود في كودك الحالي (ولا ترغب بتغييره الآن)
             Pair<Boolean, String> res = borrowingService.payFine(u.getUsername(), amt);
             System.out.println(res.second);
         } catch (NumberFormatException e) {
