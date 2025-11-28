@@ -9,7 +9,7 @@ public class Loan {
     private final int bookId;
     private final LocalDate borrowDate;
     private final LocalDate dueDate;
-    private LocalDate returnedDate; // null إذا لم يرجع بعد
+    private LocalDate returnedDate; // null if not returned yet
     private int fineApplied; // NIS
     private boolean finePaid;
 

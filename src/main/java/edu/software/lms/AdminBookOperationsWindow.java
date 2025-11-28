@@ -69,8 +69,8 @@ public class AdminBookOperationsWindow implements Window {
         int nextId = computeNextId();
         Book book = new Book(nextId, title, author, isbn);
         boolean added = bookRepo.addBook(book);
-        if (added) System.out.println("✅ Book added successfully.");
-        else System.out.println("❌ Failed to add book (maybe duplicate id or ISBN).");
+        if (added) System.out.println("Book added successfully.");
+        else System.out.println("Failed to add book (duplicate id or ISBN).");
     }
 
     private int computeNextId() {
@@ -106,13 +106,13 @@ public class AdminBookOperationsWindow implements Window {
                 Book b = bookRepo.getBookByISBN(scanner.nextLine().trim());
                 printBook(b);
             }
-            default -> System.out.println("اختيار غير صالح للبحث.");
+            default -> System.out.println("invalid.");
         }
     }
 
     private void printBook(Book b) {
         if (b == null) {
-            System.out.println("لا توجد نتيجة.");
+            System.out.println("No result.");
             return;
         }
         System.out.println("ID: " + b.getId() + " | Title: " + b.getName() + " | Author: " + b.getAuthor() + " | ISBN: " + b.getIsbn() + " | Borrowed: " + b.isBorrowed());
