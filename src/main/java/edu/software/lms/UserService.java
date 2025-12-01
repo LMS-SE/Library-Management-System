@@ -1,5 +1,7 @@
 package edu.software.lms;
 
+import java.util.List;
+
 public class UserService {
     private UserRepository userRepository = new InMemoryUserRepository();
     private BookRepository bookRepository = new InMemoryBooks();
@@ -60,4 +62,56 @@ public class UserService {
         if (user.checkPassword(password)) return new Pair<>(user, LoginResult.USER_FOUND_SUCCESSFULLY);
         return new Pair<>(null, LoginResult.USER_FOUND_WRONG_PASSWORD);
     }
+
+    private boolean isAdmin(User user) {
+        // Simple rule: user with username "admin" is treated as admin
+        return user != null && "admin".equalsIgnoreCase(user.getUsername());
+    }
+
+
+    public Pair<Boolean, String> unregisterUser(String targetUsername) {
+        if (currentUser == null) {
+            return new Pair<>(false, "No user logged in.");
+        }
+
+        if (!isAdmin(currentUser)) {
+            return new Pair<>(false, "Only admins can unregister users.");
+        }
+
+        if (targetUsername == null || targetUsername.isEmpty()) {
+            return new Pair<>(false, "Username to unregister is required.");
+        }
+
+        User target = userRepository.getUserByUsername(targetUsername);
+        if (target == null) {
+            return new Pair<>(false, "User not found.");
+        }
+
+        // Don’t allow deleting the admin account itself
+        if (isAdmin(target)) {
+            return new Pair<>(false, "Admin account cannot be unregistered.");
+        }
+
+        // 1) Unpaid fines?
+        if (target.getFineBalance() > 0) {
+            return new Pair<>(false,
+                    "User has unpaid fines (" + target.getFineBalance() + " NIS) and cannot be unregistered.");
+        }
+
+        // 2) Active loans?
+        List<Loan> loans = loanRepository.getLoansByUserId(target.getId());
+        boolean hasActiveLoans = loans.stream().anyMatch(l -> !l.isReturned());
+        if (hasActiveLoans) {
+            return new Pair<>(false, "User has active loans and cannot be unregistered.");
+        }
+
+        // 3) Perform delete
+        boolean deleted = userRepository.deleteUser(target.getId());
+        if (!deleted) {
+            return new Pair<>(false, "Failed to unregister user (repository error).");
+        }
+
+        return new Pair<>(true, "User '" + targetUsername + "' unregistered successfully.");
+    }
+
 }

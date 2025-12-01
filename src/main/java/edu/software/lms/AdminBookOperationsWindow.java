@@ -55,6 +55,7 @@ public class AdminBookOperationsWindow implements Window {
         System.out.println("6) View my loans");
         System.out.println("7) Pay fine");
         System.out.println("8) Send Overdue Notifications to all users");
+        System.out.println("9) Unregister user");
         System.out.println("back) Log out");
         System.out.println("0) Exit application");
         System.out.print("Choice: ");
@@ -120,13 +121,13 @@ public class AdminBookOperationsWindow implements Window {
                 Book b = bookRepo.getBookByISBN(scanner.nextLine().trim());
                 printBook(b);
             }
-            default -> System.out.println("اختيار غير صالح للبحث.");
+            default -> System.out.println("invalid choice");
         }
     }
 
     private void printBook(Book b) {
         if (b == null) {
-            System.out.println("لا توجد نتيجة.");
+            System.out.println("no result");
             return;
         }
         String type = (b instanceof CD) ? "CD" : "Book";
@@ -209,7 +210,7 @@ public class AdminBookOperationsWindow implements Window {
     @Override
     public Window buildNextWindow() {
         printHeader();
-        printOverdueAndFine();
+
         printMenu();
         String choice = scanner.nextLine().trim();
         switch (choice) {
@@ -221,14 +222,25 @@ public class AdminBookOperationsWindow implements Window {
             case "6" -> { viewMyLoansFlow(); return this; }
             case "7" -> { payFineFlow(); return this; }
             case "8" -> { borrowingService.remindOverdue(); return this; }
-
+            case "9" -> { unregisterUserFlow(); return this; }
             case "back" -> { System.out.println("logging out..."); return WindowFactory.create(NextWindow.LOGIN_AND_SIGNUP, userService); }
             case "0" -> { return WindowFactory.create(NextWindow.EXIT, userService); }
             default -> { System.out.println("Invalid choice. Try again."); return this; }
         }
     }
+    private void unregisterUserFlow() {
+        User admin = userService.getCurrentUser();
+        if (admin == null) {
+            System.out.println("No user logged in.");
+            return;
+        }
 
-    private void printOverdueAndFine() {
+        System.out.print("Enter username to unregister: ");
+        String target = scanner.nextLine().trim();
 
+        Pair<Boolean, String> result = userService.unregisterUser(target);
+        System.out.println(result.second);
     }
+
+
 }
