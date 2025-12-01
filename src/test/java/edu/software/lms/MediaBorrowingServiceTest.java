@@ -13,7 +13,7 @@ public class MediaBorrowingServiceTest {
         InMemoryLoanRepository lr = new InMemoryLoanRepository();
         MockTimeProvider tp = new MockTimeProvider(LocalDate.of(2025, 1, 1));
 
-        User u = new User("alice","pwd");
+        User u = new User("alice","pwd","user@gmail.com");
         u.setId("u-alice");
         ur.addUser(u);
 
@@ -44,7 +44,7 @@ public class MediaBorrowingServiceTest {
         InMemoryLoanRepository lr = new InMemoryLoanRepository();
         MockTimeProvider tp = new MockTimeProvider(LocalDate.of(2025, 1, 1));
 
-        User u = new User("bob","pwd");
+        User u = new User("bob","pwd","user@gmail.com");
         u.setId("u-bob");
         ur.addUser(u);
         CD cd = new CD(10,"Album","Singer","CD-10");

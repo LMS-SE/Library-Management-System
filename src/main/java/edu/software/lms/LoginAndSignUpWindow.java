@@ -102,16 +102,17 @@ public class LoginAndSignUpWindow implements Window {
     }
     public SignUpResult createAccountPrompt() {
 
-        String username,pwd;
+        String username,pwd,email;
         System.out.println("==Create Account==");
         System.out.println("==To Go back type 0 in either the password or the username==");
         System.out.print("Username : ");
         username=scanner.nextLine();
         System.out.print("Password : ");
         pwd=scanner.nextLine();
+        System.out.print("Email : ");
+        email=scanner.nextLine();
 
-
-        return userService.validateCreateAccountCredentials(username, pwd);
+        return userService.validateCreateAccountCredentials(username, pwd,email);
     }
 
     private boolean exitLogin(LoginResult loginResult) {

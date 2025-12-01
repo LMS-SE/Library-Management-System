@@ -13,7 +13,7 @@ public class MediaReportServiceTest {
         InMemoryLoanRepository lr = new InMemoryLoanRepository();
         MockTimeProvider tp = new MockTimeProvider(LocalDate.of(2025, 6, 1));
 
-        User u = new User("sam","pwd");
+        User u = new User("sam","pwd","user@gmail.com");
         u.setId("u-sam");
         ur.addUser(u);
 

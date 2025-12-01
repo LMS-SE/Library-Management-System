@@ -18,7 +18,7 @@ public class Integration_MediaFlowTest {
         us.setBookRepository(br);
         us.setLoanRepository(lr);
 
-        SignUpResult signUp = us.validateCreateAccountCredentials("tom","Aa1!passw");
+        SignUpResult signUp = us.validateCreateAccountCredentials("tom","Aa1!passw","tom@gmail.com");
         assertEquals(SignUpResult.USER_CREATED_SUCCESSFULLY, signUp);
         User u = us.getCurrentUser();
         assertNotNull(u);
@@ -45,7 +45,7 @@ public class Integration_MediaFlowTest {
         assertEquals(40, stored.getFineBalance());
 
         // pay fine using existing BorrowingService.payFine (keeps compatibility)
-        BorrowingService bs = new BorrowingService(ur, br, lr, tp, new BookFineStrategy());
+        BorrowingService bs = new BorrowingService(ur, br, lr, tp, new BookFineStrategy(),null);
         Pair<Boolean,String> pay = bs.payFine(u.getUsername(), 40);
         assertTrue(pay.first);
         User after = ur.getUserByUsername(u.getUsername());

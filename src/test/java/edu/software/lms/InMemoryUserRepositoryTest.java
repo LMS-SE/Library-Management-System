@@ -16,7 +16,7 @@ class InMemoryUserRepositoryTest {
 
     @Test
     void addAndGetUser() {
-        User u = new User("alice", "password123");
+        User u = new User("alice", "password123","user@gmail.com");
         u.setId("alice-id");
         boolean added = repo.addUser(u);
         assertTrue(added);
@@ -33,18 +33,18 @@ class InMemoryUserRepositoryTest {
 
     @Test
     void preventDuplicateUser() {
-        User u1 = new User("bob", "p1");
+        User u1 = new User("bob", "p1","user@gmail.com");
         u1.setId("bob-id");
         assertTrue(repo.addUser(u1));
 
-        User u2 = new User("bob", "p2"); // same username
+        User u2 = new User("bob", "p2","user@gmail.com"); // same username
         u2.setId("bob-id-2");
         assertFalse(repo.addUser(u2), "Should not add user with same username");
     }
 
     @Test
     void deleteUser() {
-        User u = new User("carol", "pw");
+        User u = new User("carol", "pw","user@gmail.com");
         u.setId("c-id");
         repo.addUser(u);
 
@@ -55,7 +55,7 @@ class InMemoryUserRepositoryTest {
 
     @Test
     void validateCredentials() {
-        User u = new User("dave", "mysecret");
+        User u = new User("dave", "mysecret","user@gmail.com");
         u.setId("d-id");
         repo.addUser(u);
         UserService userService=new UserService();

@@ -8,18 +8,18 @@ public class AdminBookOperationsWindow implements Window {
 
     private final UserService userService;
     private final BookRepository bookRepo;
-    private final BorrowingService borrowingService; // الكلاس القديم موجود عندك
-    private final MediaBorrowingService mediaBorrowingService; // الخدمة الجديدة لإدارة أنواع الوسائط (CD/Book)
-
+    private final BorrowingService borrowingService;
+    private final MediaBorrowingService mediaBorrowingService;
+    private Observer emailNotifier;
     public AdminBookOperationsWindow(UserService userService) {
+        emailNotifier=new EmailNotifier();
         this.userService = userService;
         this.bookRepo = resolveRepoFromUserServiceOrFallback(userService);
         LoanRepository loanRepo = resolveLoanRepoFromUserServiceOrFallback(userService);
 
-        // نهيئ القديم كما كان (لا نغيّر سلوكه)
-        this.borrowingService = new BorrowingService(userService.getUserRepository(), bookRepo, loanRepo, new SystemTimeProvider(), new BookFineStrategy());
+        this.borrowingService = new BorrowingService(userService.getUserRepository(), bookRepo, loanRepo, new SystemTimeProvider(), new BookFineStrategy(),emailNotifier);
 
-        // نهيئ الخدمة الجديدة التي تدعم CDs وكتب مع قواعد قرض مختلفة
+
         this.mediaBorrowingService = new MediaBorrowingService(userService.getUserRepository(), bookRepo, loanRepo, new SystemTimeProvider());
     }
 
@@ -54,6 +54,7 @@ public class AdminBookOperationsWindow implements Window {
         System.out.println("5) Return book / CD");
         System.out.println("6) View my loans");
         System.out.println("7) Pay fine");
+        System.out.println("8) Send Overdue Notifications to all users");
         System.out.println("back) Log out");
         System.out.println("0) Exit application");
         System.out.print("Choice: ");
@@ -82,8 +83,8 @@ public class AdminBookOperationsWindow implements Window {
         else book = new Book(nextId, title, author, isbn);
 
         boolean added = bookRepo.addBook(book);
-        if (added) System.out.println("✅ Item added successfully.");
-        else System.out.println("❌ Failed to add (maybe duplicate id or ISBN).");
+        if (added) System.out.println("Item added successfully.");
+        else System.out.println("Failed to add (maybe duplicate id or ISBN).");
     }
 
     private int computeNextId() {
@@ -155,7 +156,7 @@ public class AdminBookOperationsWindow implements Window {
                 System.out.println("No user logged in. Go to login first.");
                 return;
             }
-            // الآن نستخدم mediaBorrowingService ليطبق قواعد الكتب و الـCDs
+
             Pair<Boolean, String> res = mediaBorrowingService.borrowMedia(u.getUsername(), id);
             System.out.println(res.second);
         } catch (NumberFormatException e) {
@@ -166,7 +167,7 @@ public class AdminBookOperationsWindow implements Window {
     private void returnFlow() {
         System.out.print("Enter loan ID to return: ");
         String loanId = scanner.nextLine().trim();
-        // نستخدم mediaBorrowingService لإرجاع لأنّه يعرف نوع الوسيط
+
         Pair<Boolean, String> res = mediaBorrowingService.returnMedia(loanId);
         System.out.println(res.second);
     }
@@ -197,7 +198,7 @@ public class AdminBookOperationsWindow implements Window {
         String s = scanner.nextLine().trim();
         try {
             int amt = Integer.parseInt(s);
-            // نستخدم borrowingService.payFine لأنّه موجود في كودك الحالي (ولا ترغب بتغييره الآن)
+
             Pair<Boolean, String> res = borrowingService.payFine(u.getUsername(), amt);
             System.out.println(res.second);
         } catch (NumberFormatException e) {
@@ -208,6 +209,7 @@ public class AdminBookOperationsWindow implements Window {
     @Override
     public Window buildNextWindow() {
         printHeader();
+        printOverdueAndFine();
         printMenu();
         String choice = scanner.nextLine().trim();
         switch (choice) {
@@ -218,9 +220,15 @@ public class AdminBookOperationsWindow implements Window {
             case "5" -> { returnFlow(); return this; }
             case "6" -> { viewMyLoansFlow(); return this; }
             case "7" -> { payFineFlow(); return this; }
+            case "8" -> { borrowingService.remindOverdue(); return this; }
+
             case "back" -> { System.out.println("logging out..."); return WindowFactory.create(NextWindow.LOGIN_AND_SIGNUP, userService); }
             case "0" -> { return WindowFactory.create(NextWindow.EXIT, userService); }
             default -> { System.out.println("Invalid choice. Try again."); return this; }
         }
+    }
+
+    private void printOverdueAndFine() {
+
     }
 }

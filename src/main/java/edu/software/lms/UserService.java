@@ -20,7 +20,7 @@ public class UserService {
     public User getCurrentUser() { return currentUser; }
     public void setCurrentUser(User currentUser) { this.currentUser = currentUser; }
 
-    public SignUpResult validateCreateAccountCredentials(String username, String pwd) {
+    public SignUpResult validateCreateAccountCredentials(String username, String pwd,String email) {
         if (pwd.equals("0") || username.equals("0")) {
             return SignUpResult.CANCEL_SIGNUP;
         }
@@ -31,7 +31,7 @@ public class UserService {
             return SignUpResult.PASSWORD_WEAK;
         }
         String hashedPwd = CustomUtilities.hashPassword(pwd, username);
-        User newUser = new User(username, hashedPwd);
+        User newUser = new User(username, hashedPwd, email);
         boolean userCreationResult = userRepository.addUser(newUser);
         if (userCreationResult) {
             this.currentUser = newUser;

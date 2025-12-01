@@ -11,19 +11,25 @@ public class BorrowingService {
     private final TimeProvider timeProvider;
     private final FineCalculator fineCalculator;
     private static final int BOOK_LOAN_DAYS = 28;
-
+    private final ReminderService  reminderService;
     public BorrowingService(UserRepository userRepository,
                             BookRepository bookRepository,
                             LoanRepository loanRepository,
                             TimeProvider timeProvider,
-                            FineStrategy fineStrategy) {
+                            FineStrategy fineStrategy,
+                            Observer emailNotifier) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.loanRepository = loanRepository;
         this.timeProvider = timeProvider;
         this.fineCalculator = new FineCalculator(fineStrategy, timeProvider);
-    }
+        reminderService=new ReminderService(loanRepository,timeProvider, userRepository);
+        reminderService.addObserver(emailNotifier);
 
+    }
+    void remindOverdue(){
+        reminderService.sendOverdueNotifications();
+    }
     public Pair<Boolean, String> borrowBook(String username, int bookId) {
         if (username == null || username.isEmpty()) return new Pair<>(false, "Invalid user");
         User user = userRepository.getUserByUsername(username);
