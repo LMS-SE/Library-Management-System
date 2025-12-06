@@ -19,7 +19,7 @@ public class TestReminder {
         TimeProvider tp = () -> today;  // or new MockTimeProvider(today)
 
         UserRepository userRepository = new InMemoryUserRepository();
-        User u = new User("user", "pass", "user@uni.com");
+        User u = new User("user", "pass", "user@uni.com",false);
         userRepository.addUser(u);
 
         ReminderService reminder = new ReminderService(repo, tp, userRepository);
@@ -52,7 +52,7 @@ public class TestReminder {
         TimeProvider tp = () -> today;
 
         UserRepository userRepository = new InMemoryUserRepository();
-        User u = new User("user1", "pass", "user1@uni.com");
+        User u = new User("user1", "pass", "user1@uni.com",false);
         userRepository.addUser(u);
 
         ReminderService reminder = new ReminderService(repo, tp, userRepository);
@@ -84,7 +84,7 @@ public class TestReminder {
         TimeProvider tp = () -> today;
 
         UserRepository userRepository = new InMemoryUserRepository();
-        User u = new User("user2", "pass", "user2@uni.com");
+        User u = new User("user2", "pass", "user2@uni.com",false);
         userRepository.addUser(u);
 
         ReminderService reminder = new ReminderService(repo, tp, userRepository);
@@ -123,8 +123,8 @@ public class TestReminder {
         TimeProvider tp = () -> today;
 
         UserRepository userRepository = new InMemoryUserRepository();
-        User u1 = new User("userA", "pass", "userA@uni.com");
-        User u2 = new User("userB", "pass", "userB@uni.com");
+        User u1 = new User("userA", "pass", "userA@uni.com",false);
+        User u2 = new User("userB", "pass", "userB@uni.com",false);
         userRepository.addUser(u1);
         userRepository.addUser(u2);
 
@@ -165,13 +165,13 @@ public class TestReminder {
         TimeProvider tp = () -> today;
 
         UserRepository userRepository = new InMemoryUserRepository();
-        User u = new User("userC", "pass", "userC@uni.com");
+        User u = new User("userC", "pass", "userC@uni.com",false);
         userRepository.addUser(u);
 
         ReminderService reminder = new ReminderService(repo, tp, userRepository);
         Observer email = mock(Observer.class);
         reminder.addObserver(email);
-        reminder.removeObserver(email);  // 👈 removed
+        reminder.removeObserver(email);
 
         Loan loan = new Loan(
                 u.getId(),

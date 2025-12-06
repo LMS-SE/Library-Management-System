@@ -36,7 +36,7 @@ class BorrowingServiceTest {
 
     @Test
     public void testBorrowBookNotFound() {
-        User u = new User("John", "123","john@gmail.com");
+        User u = new User("John", "123","john@gmail.com",false);
         u.setId("U1");
         users.addUser(u);
 
@@ -46,7 +46,7 @@ class BorrowingServiceTest {
 
     @Test
     public void testBorrowBookAlreadyBorrowed() {
-        User u = new User("John", "123","john@gmail.com");
+        User u = new User("John", "123","john@gmail.com",false);
         u.setId("U1");
         users.addUser(u);
 
@@ -60,7 +60,7 @@ class BorrowingServiceTest {
 
     @Test
     public void testSuccessfulBorrow() {
-        User u = new User("John", "123","john@gmail.com");
+        User u = new User("John", "123","john@gmail.com",false);
         u.setId("U1");
         users.addUser(u);
 
@@ -80,7 +80,7 @@ class BorrowingServiceTest {
 
     @Test
     public void testReturnAlreadyReturned() {
-        User u = new User("John", "123","john@gmail.com");
+        User u = new User("John", "123","john@gmail.com",false);
         u.setId("U1");
         users.addUser(u);
 
@@ -112,7 +112,7 @@ class BorrowingServiceTest {
 
     @Test
     public void testPayFineInvalidAmount() {
-        User u = new User("John", "123","john@gmail.com");
+        User u = new User("John", "123","john@gmail.com",false);
         users.addUser(u);
 
         var r = service.payFine("John", -10);
@@ -121,7 +121,7 @@ class BorrowingServiceTest {
 
     @Test
     public void testPayFineSuccess() {
-        User u = new User("John", "123","john@gmail.com");
+        User u = new User("John", "123","john@gmail.com",false);
         u.setId("U1");
         users.addUser(u);
 

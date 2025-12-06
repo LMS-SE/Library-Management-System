@@ -8,7 +8,9 @@ public class UserService {
     private LoanRepository loanRepository = new InMemoryLoanRepository();
     private User currentUser;
 
-    public UserService() { }
+    public UserService() {
+        createAdmin("admin","admin@ADMIN123","admin@gmail.com");
+    }
 
     public UserRepository getUserRepository() { return userRepository; }
     public void setUserRepository(UserRepository userRepository) { this.userRepository = userRepository; }
@@ -33,7 +35,7 @@ public class UserService {
             return SignUpResult.PASSWORD_WEAK;
         }
         String hashedPwd = CustomUtilities.hashPassword(pwd, username);
-        User newUser = new User(username, hashedPwd, email);
+        User newUser = new User(username, hashedPwd, email,false);
         boolean userCreationResult = userRepository.addUser(newUser);
         if (userCreationResult) {
             this.currentUser = newUser;
@@ -41,6 +43,27 @@ public class UserService {
         }
         return SignUpResult.USER_CREATION_FAILED;
     }
+
+    public SignUpResult createAdmin(String username, String pwd,String email) {
+        if (pwd.equals("0") || username.equals("0")) {
+            return SignUpResult.CANCEL_SIGNUP;
+        }
+        if (pwd.length() < 8) {
+            return SignUpResult.PASSWORD_TOO_SHORT;
+        }
+        if (!CustomUtilities.isStrongPassword(pwd)) {
+            return SignUpResult.PASSWORD_WEAK;
+        }
+        String hashedPwd = CustomUtilities.hashPassword(pwd, username);
+        User newUser = new User(username, hashedPwd, email,true);
+        boolean userCreationResult = userRepository.addUser(newUser);
+        if (userCreationResult) {
+            this.currentUser = newUser;
+            return SignUpResult.USER_CREATED_SUCCESSFULLY;
+        }
+        return SignUpResult.USER_CREATION_FAILED;
+    }
+
 
     public LoginResult validateLoginCredentials(String username, String pwd) {
         if (username.isEmpty()) return LoginResult.INVALID_USERNAME;

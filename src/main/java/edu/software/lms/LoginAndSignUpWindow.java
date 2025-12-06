@@ -1,7 +1,5 @@
 package edu.software.lms;
 
-import java.util.Scanner;
-
 
 
 
@@ -10,10 +8,12 @@ public class LoginAndSignUpWindow implements Window {
 
     public LoginAndSignUpWindow(UserService userService) {
         this.userService = userService;
+
     }
 
     @Override
     public Window buildNextWindow() {
+
         printMessage();
         String choice = scanner.nextLine();
         switch (choice) {
@@ -58,7 +58,8 @@ public class LoginAndSignUpWindow implements Window {
         if(signUpResult==SignUpResult.CANCEL_SIGNUP){
             return this;
         }
-        return WindowFactory.create(NextWindow.ADMIN_BOOK_OPERATIONS,userService);
+
+        return WindowFactory.create(NextWindow.USER_BOOK_OPERATIONS,userService);
     }
 
     private Window loginOperation() {
@@ -76,7 +77,10 @@ public class LoginAndSignUpWindow implements Window {
         if(loginResult==LoginResult.CANCEL_LOGIN){
             return this;
         }
-        return WindowFactory.create(NextWindow.ADMIN_BOOK_OPERATIONS,userService);
+        if (userService.getCurrentUser().isAdmin()) {
+            return WindowFactory.create(NextWindow.ADMIN_BOOK_OPERATIONS, userService);
+        }
+        return WindowFactory.create(NextWindow.USER_BOOK_OPERATIONS, userService);
     }
 
     private boolean exitSignUp(SignUpResult signUpResult) {

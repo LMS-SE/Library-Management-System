@@ -17,8 +17,8 @@ public class TestUnregisterUser {
         UserService svc = setupService();
         UserRepository repo = svc.getUserRepository();
 
-        User admin = new User("admin", "pwd","user@gmail.com");
-        User user  = new User("alice", "pwd","user@gmail.com");
+        User admin = new User("admin", "pwd","user@gmail.com",false);
+        User user  = new User("alice", "pwd","user@gmail.com",false);
         repo.addUser(admin);
         repo.addUser(user);
         svc.setCurrentUser(admin);
@@ -34,8 +34,8 @@ public class TestUnregisterUser {
         UserService svc = setupService();
         UserRepository repo = svc.getUserRepository();
 
-        User normal = new User("bob", "pwd","user@gmail.com");
-        User user   = new User("alice", "pwd","user@gmail.com");
+        User normal = new User("bob", "pwd","user@gmail.com",false);
+        User user   = new User("alice", "pwd","user@gmail.com",false);
         repo.addUser(normal);
         repo.addUser(user);
         svc.setCurrentUser(normal);
@@ -52,8 +52,8 @@ public class TestUnregisterUser {
         UserRepository userRepo = svc.getUserRepository();
         LoanRepository loanRepo = svc.getLoanRepository();
 
-        User admin = new User("admin", "pwd","user@gmail.com");
-        User user  = new User("alice", "pwd","user@gmail.com");
+        User admin = new User("admin", "pwd","user@gmail.com",false);
+        User user  = new User("alice", "pwd","user@gmail.com",false);
         userRepo.addUser(admin);
         userRepo.addUser(user);
         svc.setCurrentUser(admin);
@@ -75,8 +75,8 @@ public class TestUnregisterUser {
         UserService svc = setupService();
         UserRepository repo = svc.getUserRepository();
 
-        User admin = new User("admin", "pwd","user@gmail.com");
-        User user  = new User("alice", "pwd","user@gmail.com");
+        User admin = new User("admin", "pwd","user@gmail.com",false);
+        User user  = new User("alice", "pwd","user@gmail.com",false);
         repo.addUser(admin);
         repo.addUser(user);
         svc.setCurrentUser(admin);

@@ -9,6 +9,9 @@ public class WindowFactory {
                 case ADMIN_BOOK_OPERATIONS -> {
                     return new AdminBookOperationsWindow(userService);
                 }
+                case USER_BOOK_OPERATIONS -> {
+                    return new UserBookOperations(userService);
+                }
                 case EXIT -> {
                     return null;
                 }

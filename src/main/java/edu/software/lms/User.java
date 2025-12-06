@@ -12,6 +12,16 @@ public class User {
     private String email;
     private List<String> loanIds;
 
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
+    private boolean isAdmin;
+
     public String getEmail() {
         return email;
     }
@@ -20,13 +30,14 @@ public class User {
         this.email = email;
     }
 
-    public User(String username, String password, String email) {
+    public User(String username, String password, String email,boolean isAdmin) {
         this.username = username;
         this.password = password;
         this.id = username;
         this.fineBalance = 0;
         this.loanIds = new ArrayList<>();
         this.email = email;
+        this.isAdmin = isAdmin;
     }
 
     public String getUsername() { return username; }
