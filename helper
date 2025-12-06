@@ -1,0 +1,51 @@
+Short answer: yes — the log shows a clear SonarCloud configuration/permission problem. Key errors and fixes:
+
+What’s wrong (from the log)
+- "Project not found. Please check the 'sonar.projectKey' and 'sonar.organization' properties, the 'SONAR_TOKEN' environment variable…" — the scanner cannot find the project on SonarCloud.
+- "Failed to load the default quality profiles: No organization with key 'LMS-SE'" — Sonar attempted to use organization key LMS-SE (case‑sensitive) but that org doesn’t exist or the token can’t access it.
+- "Detected project binding: ERROR" and "This project has been banned from the build due to previous failures." — follow-on effects from the missing/incorrect org or permissions.
+
+Most likely root causes
+- sonar.organization is missing or wrong (wrong capitalization or different key).
+- SONAR_TOKEN is not set, invalid, or the token’s user does not belong to / have analysis rights on the organization.
+- The project has not been created/bound in the target SonarCloud organization.
+
+Concrete fixes
+1) Confirm the exact organization key (case exact)
+   - On SonarCloud: open your org page; the org key is in the URL:
+     https://sonarcloud.io/organizations/<org-key>/projects
+   - Use that exact string (capitalization matters).
+
+2) Update CI to pass the organization + login explicitly
+   - Edit .github/workflows/build.yml (ref: 6d566dcbf3fbdc0c27fd00253c2da5180a93c66d) and change the mvn step to include sonar.organization and sonar.login (and host URL if needed). Example:
+
+- name: Build and analyze
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+    -Dsonar.organization=Exact-Org-Key \
+    -Dsonar.projectKey=Exact-Org-Key_Library-Management-System \
+    -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+    -Dsonar.host.url=https://sonarcloud.io
+
+Replace Exact-Org-Key with the exact key from SonarCloud (matching case). If your project key used LMS-SE_ prefix, ensure the organization key is LMS-SE exactly only if that is the real org key.
+
+3) Verify the SONAR_TOKEN secret
+   - Ensure repository secret SONAR_TOKEN contains a token created in SonarCloud.
+   - Token must belong to a user who is a member of the target organization and has permission to analyze (most tokens created in org account have the correct rights).
+   - Test locally with: mvn ... -Dsonar.login=<token> -Dsonar.organization=<org-key> -Dsonar.host.url=https://sonarcloud.io
+
+4) Confirm the project exists/binding
+   - If the project hasn’t been created on SonarCloud, create/import it under the correct org.
+   - Alternatively, create the project via the web UI or the SonarCloud import from GitHub.
+
+Quick local test command
+mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+  -Dsonar.organization=Exact-Org-Key \
+  -Dsonar.projectKey=Exact-Org-Key_Library-Management-System \
+  -Dsonar.login=<token> \
+  -Dsonar.host.url=https://sonarcloud.io
+
+If you want I can:
+- check the current workflow file and prepare a PR with the exact change (I’ll need the exact org key you want to use), or
+- show where to create the SonarCloud token and how to add it to repository secrets.
