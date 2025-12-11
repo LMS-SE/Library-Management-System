@@ -1,20 +1,22 @@
 package edu.software.lms;
 
 import java.util.Scanner;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class BookService {
 
-    private BookService() {
-        // prevents instantiation
-    }
+    // Prevent instantiation
+    private BookService() { }
 
     private static final Logger logger = Logger.getLogger(BookService.class.getName());
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void searchBookFlow(BookRepository bookRepo) {
+
         logger.info("Search by: 1-Title  2-Author  3-ISBN");
         logger.info("Choice:");
+
         String opt = scanner.nextLine().trim();
 
         switch (opt) {
@@ -38,6 +40,7 @@ public final class BookService {
     }
 
     public static void printBook(Book b) {
+
         if (b == null) {
             logger.info("No result found.");
             return;
@@ -45,13 +48,17 @@ public final class BookService {
 
         String type = (b instanceof CD) ? "CD" : "Book";
 
-        logger.info(
-                "ID: " + b.getId()
-                        + " | Type: " + type
-                        + " | Title: " + b.getName()
-                        + " | Author: " + b.getAuthor()
-                        + " | ISBN: " + b.getIsbn()
-                        + " | Borrowed: " + b.isBorrowed()
+        logger.log(
+                Level.INFO,
+                "ID: {0} | Type: {1} | Title: {2} | Author: {3} | ISBN: {4} | Borrowed: {5}",
+                new Object[]{
+                        b.getId(),
+                        type,
+                        b.getName(),
+                        b.getAuthor(),
+                        b.getIsbn(),
+                        b.isBorrowed()
+                }
         );
     }
 }
