@@ -65,6 +65,6 @@ class InMemoryUserRepositoryTest {
         assertEquals(new Pair<>(null,LoginResult.NO_USER_FOUND),userService.validateCredentials("none","123"));
         assertEquals(new Pair<>(u, LoginResult.USER_FOUND_SUCCESSFULLY),userService.validateCredentials("dave","mysecret"));
         assertEquals(new Pair<>(null,LoginResult.USER_FOUND_WRONG_PASSWORD),userService.validateCredentials("dave","123"));
-        ;
+
     }
 }

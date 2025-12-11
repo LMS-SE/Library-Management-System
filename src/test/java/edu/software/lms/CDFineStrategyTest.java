@@ -3,7 +3,7 @@ package edu.software.lms;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CDFineStrategyTest {
+class CDFineStrategyTest {
 
     @Test
     void cdFineCalculation_zeroWhenNotOverdue() {

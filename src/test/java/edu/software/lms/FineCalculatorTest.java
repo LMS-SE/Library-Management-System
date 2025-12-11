@@ -2,11 +2,12 @@ package edu.software.lms;
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDate;
-public class FineCalculatorTest {
+
+class FineCalculatorTest {
 
 
     @Test
-    public void testFineCalculation() {
+    void testFineCalculation() {
         FineStrategy mock = days -> days * 2;
         TimeProvider mockTime = () -> LocalDate.of(2024,1,20);
 

@@ -8,116 +8,107 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryBooksTest {
     InMemoryBooks inMemoryBooks;
-    Book testBooK;
+    Book testBook;
 
     @BeforeEach
     void setUp() {
         inMemoryBooks = new InMemoryBooks();
-        testBooK = new Book(1,"OOP","Arthur Morgan","123");
-        inMemoryBooks.addBook(testBooK);
+        testBook = new Book(1,"OOP","Arthur Morgan","123");
+        inMemoryBooks.addBook(testBook);
     }
 
     @AfterEach
     void tearDown() {
         inMemoryBooks = null;
-        testBooK = null;
+        testBook = null;
     }
 
     @Test
     void getBookById() {
-        Book book = inMemoryBooks.getBookById(1);
-        assertNotNull(book);
-
+        Book foundBook = inMemoryBooks.getBookById(1);
+        assertNotNull(foundBook);
     }
 
     @Test
     void getBookByName() {
-        Book book = inMemoryBooks.getBookByName("OOP");
-        assertNotNull(book);
-
+        Book foundBook = inMemoryBooks.getBookByName("OOP");
+        assertNotNull(foundBook);
     }
 
     @Test
     void getBookByAuthor() {
-        Book book = inMemoryBooks.getBookByAuthor("Arthur Morgan");
-        assertNotNull(book);
+        Book foundBook = inMemoryBooks.getBookByAuthor("Arthur Morgan");
+        assertNotNull(foundBook);
     }
 
     @Test
     void getBookByISBN() {
-        Book book = inMemoryBooks.getBookByISBN("123");
-        assertNotNull(book);
+        Book foundBook = inMemoryBooks.getBookByISBN("123");
+        assertNotNull(foundBook);
     }
 
     @Test
     void addNullBook() {
-        Book book = null;
-        boolean adding_result = inMemoryBooks.addBook(book);
-        assertFalse(adding_result);
+        assertFalse(inMemoryBooks.addBook(null));
+    }
 
-    }
     @Test
-    void addIdSimilarBook() {
-        Book book2 = new Book(1,"Data Structure","John Marston","314");
-        boolean adding_result = inMemoryBooks.addBook(book2);
-        assertFalse(adding_result);
+    void addBookWithSameId() {
+        Book bookToAdd = new Book(1,"Data Structure","John Marston","314");
+        assertFalse(inMemoryBooks.addBook(bookToAdd));
     }
+
     @Test
-    void addISBNSimilarBook() {
-        Book book2 = new Book(2,"Data Structure","John Marston","123");
-        boolean adding_result = inMemoryBooks.addBook(book2);
-        assertFalse(adding_result);
+    void addBookWithSameISBN() {
+        Book bookToAdd = new Book(2,"Data Structure","John Marston","123");
+        assertFalse(inMemoryBooks.addBook(bookToAdd));
     }
+
     @Test
     void addNewBook() {
-        Book book2 = new Book(2,"Data Structure","John Marston","314");
-        boolean adding_result = inMemoryBooks.addBook(book2);
-        assertTrue(adding_result);
+        Book bookToAdd = new Book(2,"Data Structure","John Marston","314");
+        assertTrue(inMemoryBooks.addBook(bookToAdd));
     }
+
     @Test
     void failToGetBookByName() {
-        Book book = inMemoryBooks.getBookByName("Data Structure");
-        assertNull(book);
-
+        Book foundBook = inMemoryBooks.getBookByName("Data Structure");
+        assertNull(foundBook);
     }
 
     @Test
     void failToGetBookByAuthor() {
-        Book book = inMemoryBooks.getBookByAuthor("John Marston");
-        assertNull(book);
+        Book foundBook = inMemoryBooks.getBookByAuthor("John Marston");
+        assertNull(foundBook);
     }
 
     @Test
     void failToGetBookByISBN() {
-        Book book = inMemoryBooks.getBookByISBN("314");
-        assertNull(book);
+        Book foundBook = inMemoryBooks.getBookByISBN("314");
+        assertNull(foundBook);
     }
+
     @Test
     void failToGetBookById() {
-        Book book = inMemoryBooks.getBookById(2);
-        assertNull(book);
+        Book foundBook = inMemoryBooks.getBookById(2);
+        assertNull(foundBook);
     }
+
     @Test
     void getNextIdWhenEmpty() {
         InMemoryBooks emptyRepo = new InMemoryBooks();
-        int nextId = emptyRepo.getNextId();
-        assertEquals(1, nextId);
+        assertEquals(1, emptyRepo.getNextId());
     }
 
     @Test
     void getNextIdWhenBooksExist() {
-        // Already added book with id = 1 in @BeforeEach
-        int nextId = inMemoryBooks.getNextId();
-        assertEquals(2, nextId);
+        assertEquals(2, inMemoryBooks.getNextId());
     }
 
     @Test
     void getNextIdWithMultipleBooks() {
         inMemoryBooks.addBook(new Book(5, "DS", "John", "555"));
         inMemoryBooks.addBook(new Book(3, "Algo", "Bill", "999"));
-
-        int nextId = inMemoryBooks.getNextId();
-        assertEquals(6, nextId);
+        assertEquals(6, inMemoryBooks.getNextId());
     }
-
 }

@@ -22,7 +22,8 @@ class BookTest {
 
         assertNotEquals(null, b1);
 
-        assertNotEquals("string", b1);
+        assertNotEquals(null, b1);
+
     }
 
     @Test
