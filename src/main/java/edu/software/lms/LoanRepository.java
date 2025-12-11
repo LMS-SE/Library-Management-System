@@ -1,7 +1,4 @@
 package edu.software.lms;
-
-import java.util.List;
-
 public interface LoanRepository {
     Loan getLoanById(String id);
     java.util.List<Loan> getLoansByUserId(String userId);
