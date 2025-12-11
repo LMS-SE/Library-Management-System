@@ -1,6 +1,7 @@
 package edu.software.lms;
 
 public class WindowFactory {
+    private WindowFactory() {}
     public static Window create(NextWindow nextWindow,UserService userService) {
             switch (nextWindow) {
                 case LOGIN_AND_SIGNUP -> {

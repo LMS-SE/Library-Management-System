@@ -172,6 +172,7 @@ class MediaBorrowingServiceEdgeCasesTest {
 
             @Override
             public void updateLoan(Loan loan) {
+                //no need to implement here
             }
         };
 
