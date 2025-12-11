@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
-public final class CustomUtilities {
+public class CustomUtilities {
 
     private CustomUtilities() {}
 
@@ -17,14 +17,20 @@ public final class CustomUtilities {
         return hasDigit && hasLower && hasUpper && hasSymbol;
     }
 
-    public static String hashPassword(String password, String username) {
+    public static String hashPassword(String password, String username) throws HashingException {
         try {
             String saltedPassword = password + username;
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hashedBytes = md.digest(saltedPassword.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(hashedBytes);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 algorithm not found!", e);
+            throw new HashingException("SHA-256 algorithm not found!", e);
+        }
+    }
+
+    public static class HashingException extends Exception {
+        public HashingException(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 }
