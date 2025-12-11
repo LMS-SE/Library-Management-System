@@ -3,16 +3,18 @@ package edu.software.lms;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-public class BookService {
+public final class BookService {
+
+    private BookService() {
+        // prevents instantiation
+    }
 
     private static final Logger logger = Logger.getLogger(BookService.class.getName());
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void searchBookFlow(BookRepository bookRepo) {
-
         logger.info("Search by: 1-Title  2-Author  3-ISBN");
         logger.info("Choice:");
-
         String opt = scanner.nextLine().trim();
 
         switch (opt) {
