@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 public class AdminBookOperationsWindow implements Window {
     private static final Scanner scanner = new Scanner(System.in);
     private static final Logger logger = Logger.getLogger(AdminBookOperationsWindow.class.getName());
-
     private final UserService userService;
     private final BookRepository bookRepo;
     private final BorrowingService borrowingService;
@@ -24,9 +23,12 @@ public class AdminBookOperationsWindow implements Window {
                 new SystemTimeProvider(),
                 new BookFineStrategy(),
                 emailNotifier
-        );    }
+        );
+    }
 
-    private void printHeader() { logger.info("\n=== Admin Book Operations ==="); }
+    private void printHeader() {
+        logger.info("\n=== Admin Book Operations ===");
+    }
 
     private void printMenu() {
         logger.info("Choose an option:");
@@ -41,17 +43,17 @@ public class AdminBookOperationsWindow implements Window {
     }
 
     private void addBookFlow() {
-        System.out.print("Is this a CD? (y/N): ");
+        logger.info("Is this a CD? (y/N): ");
         String isCd = scanner.nextLine().trim();
         boolean cd = isCd.equalsIgnoreCase("y");
 
-        System.out.print("Enter title: ");
+        logger.info("Enter title: ");
         String title = scanner.nextLine().trim();
 
-        System.out.print("Enter author: ");
+        logger.info("Enter author: ");
         String author = scanner.nextLine().trim();
 
-        System.out.print("Enter ISBN: ");
+        logger.info("Enter ISBN: ");
         String isbn = scanner.nextLine().trim();
 
         if (title.isEmpty() || author.isEmpty() || isbn.isEmpty()) {
@@ -78,21 +80,47 @@ public class AdminBookOperationsWindow implements Window {
         printMenu();
         String choice = scanner.nextLine().trim();
         switch (choice) {
-            case "1" -> { addBookFlow(); return this; }
-            case "2" -> { BookService.searchBookFlow(bookRepo); return this; }
-            case "3" -> { listAllBooks(); return this; }
-            case "4" -> { borrowingService.remindOverdue(); return this; }
-            case "5" -> { unregisterUserFlow(); return this; }
-            case "back" -> { logger.info("Logging out..."); return WindowFactory.create(NextWindow.LOGIN_AND_SIGNUP, userService); }
-            case "0" -> { return WindowFactory.create(NextWindow.EXIT, userService); }
-            default -> { logger.warning("Invalid choice. Try again."); return this; }
+            case "1" -> {
+                addBookFlow();
+                return this;
+            }
+            case "2" -> {
+                BookService.searchBookFlow(bookRepo);
+                return this;
+            }
+            case "3" -> {
+                listAllBooks();
+                return this;
+            }
+            case "4" -> {
+                borrowingService.remindOverdue();
+                return this;
+            }
+            case "5" -> {
+                unregisterUserFlow();
+                return this;
+            }
+            case "back" -> {
+                logger.info("Logging out...");
+                return WindowFactory.create(NextWindow.LOGIN_AND_SIGNUP, userService);
+            }
+            case "0" -> {
+                return WindowFactory.create(NextWindow.EXIT, userService);
+            }
+            default -> {
+                logger.warning("Invalid choice. Try again.");
+                return this;
+            }
         }
     }
 
     private void unregisterUserFlow() {
         User admin = userService.getCurrentUser();
-        if (admin == null) { logger.warning("No user logged in."); return; }
-        System.out.print("Enter username to unregister: ");
+        if (admin == null) {
+            logger.warning("No user logged in.");
+            return;
+        }
+        logger.info("Enter username to unregister: ");
         String target = scanner.nextLine().trim();
         Pair<Boolean, String> result = userService.unregisterUser(target);
         logger.info(result.second);
