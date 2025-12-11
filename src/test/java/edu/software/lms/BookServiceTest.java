@@ -6,7 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
 class BookServiceTest {
@@ -75,27 +75,19 @@ class BookServiceTest {
 
     @Test
     void printBook_null_printsNoResultFound() {
-        // Just call it to hit the null branch
-        BookService.printBook(null);
-        // No exception = pass; log output not asserted
+        assertDoesNotThrow(() -> BookService.printBook(null));
     }
 
     @Test
     void printBook_withNormalBook_logsInfo() {
         Book book = new Book(1, "Title", "Author", "ISBN");
-
-        BookService.printBook(book);
-
-        // We don't assert logs, but this hits the normal book path
-        // and exercises logger.log(...) with a Book
+        assertDoesNotThrow(() -> BookService.printBook(book));
     }
 
     @Test
     void printBook_withCD_logsTypeCd() {
         Book cd = new CD(2, "Album", "Artist", "CD-123");
-
-        BookService.printBook(cd);
-
-        // This hits the "b instanceof CD" branch and logs with type = "CD"
+        assertDoesNotThrow(() -> BookService.printBook(cd));
     }
+
 }
