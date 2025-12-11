@@ -35,7 +35,7 @@ public class AdminBookOperationsWindow implements Window {
     }
 
     private void addBookFlow() {
-        System.out.print("Is this a CD? (y/N): "); // سؤال للمستخدم يفضل يظل
+        System.out.print("Is this a CD? (y/N): ");
         String isCd = scanner.nextLine().trim();
         boolean cd = isCd.equalsIgnoreCase("y");
 
