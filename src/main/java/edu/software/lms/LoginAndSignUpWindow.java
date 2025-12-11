@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 public final class LoginAndSignUpWindow implements Window {
     private static final Logger logger = Logger.getLogger(LoginAndSignUpWindow.class.getName());
-    private static final Scanner scanner = new Scanner(System.in);
+    private static Scanner scanner = new Scanner(System.in);
     private final UserService userService;
 
     public LoginAndSignUpWindow(UserService userService) {
