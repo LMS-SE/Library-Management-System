@@ -5,11 +5,14 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class AdminBookOperationsWindow implements Window {
-    private static final Scanner scanner = new Scanner(System.in);
+    private static Scanner scanner = new Scanner(System.in);
     private static final Logger logger = Logger.getLogger(AdminBookOperationsWindow.class.getName());
     private final UserService userService;
     private final BookRepository bookRepo;
     private final BorrowingService borrowingService;
+    static void setScanner(Scanner testScanner) {
+        scanner = testScanner;
+    }
 
     public AdminBookOperationsWindow(UserService userService) {
         Observer emailNotifier = new EmailNotifier();

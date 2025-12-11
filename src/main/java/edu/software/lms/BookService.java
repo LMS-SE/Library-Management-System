@@ -10,7 +10,10 @@ public final class BookService {
     private BookService() { }
 
     private static final Logger logger = Logger.getLogger(BookService.class.getName());
-    private static final Scanner scanner = new Scanner(System.in);
+    private static Scanner scanner = new Scanner(System.in);
+    static void setScanner(Scanner testScanner) {
+        scanner = testScanner;
+    }
 
     public static void searchBookFlow(BookRepository bookRepo) {
 
