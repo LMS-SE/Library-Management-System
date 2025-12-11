@@ -17,8 +17,14 @@ public class AdminBookOperationsWindow implements Window {
         this.userService = userService;
         this.bookRepo = userService.getBookRepository();
         LoanRepository loanRepo = userService.getLoanRepository();
-        this.borrowingService = new BorrowingService(userService.getUserRepository(), bookRepo, loanRepo, new SystemTimeProvider(), new BookFineStrategy(), emailNotifier);
-    }
+        this.borrowingService = new BorrowingService(
+                userService.getUserRepository(),
+                bookRepo,
+                loanRepo,
+                new SystemTimeProvider(),
+                new BookFineStrategy(),
+                emailNotifier
+        );    }
 
     private void printHeader() { logger.info("\n=== Admin Book Operations ==="); }
 
