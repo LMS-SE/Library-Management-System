@@ -40,8 +40,8 @@ public class BorrowingService {
         }
 
         List<Loan> userLoans = loanRepository.getLoansByUserId(user.getId());
-        LocalDate today = timeProvider.today();
-        boolean hasOverdue = userLoans.stream().anyMatch(l -> l.isOverdue(today) && !l.isReturned());
+        LocalDate borrowDate = timeProvider.today();
+        boolean hasOverdue = userLoans.stream().anyMatch(l -> l.isOverdue(borrowDate) && !l.isReturned());
         if (hasOverdue) {
             return new Pair<>(false, "Cannot borrow: you have overdue book(s).");
         }
@@ -50,8 +50,7 @@ public class BorrowingService {
         if (book == null) return new Pair<>(false, "Book not found");
         if (book.isBorrowed()) return new Pair<>(false, "Book is already borrowed");
 
-        LocalDate borrowDate = today;
-        LocalDate dueDate = borrowDate.plus(BOOK_LOAN_DAYS, ChronoUnit.DAYS);
+        LocalDate dueDate = borrowDate.plusDays(BOOK_LOAN_DAYS);
         Loan loan = new Loan(user.getId(), bookId, borrowDate, dueDate);
         boolean added = loanRepository.addLoan(loan);
         if (!added) return new Pair<>(false, "Failed to record loan");

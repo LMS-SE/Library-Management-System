@@ -44,24 +44,22 @@ public class UserService {
         return SignUpResult.USER_CREATION_FAILED;
     }
 
-    public SignUpResult createAdmin(String username, String pwd,String email) {
+    public void createAdmin(String username, String pwd, String email) {
         if (pwd.equals("0") || username.equals("0")) {
-            return SignUpResult.CANCEL_SIGNUP;
+            return;
         }
         if (pwd.length() < 8) {
-            return SignUpResult.PASSWORD_TOO_SHORT;
+            return;
         }
         if (!CustomUtilities.isStrongPassword(pwd)) {
-            return SignUpResult.PASSWORD_WEAK;
+            return;
         }
         String hashedPwd = CustomUtilities.hashPassword(pwd, username);
         User newUser = new User(username, hashedPwd, email,true);
         boolean userCreationResult = userRepository.addUser(newUser);
         if (userCreationResult) {
             this.currentUser = newUser;
-            return SignUpResult.USER_CREATED_SUCCESSFULLY;
         }
-        return SignUpResult.USER_CREATION_FAILED;
     }
 
 
