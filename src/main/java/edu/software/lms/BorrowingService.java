@@ -1,65 +1,54 @@
 package edu.software.lms;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 public class BorrowingService {
+
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final LoanRepository loanRepository;
     private final TimeProvider timeProvider;
     private final FineCalculator fineCalculator;
+    private final ReminderService reminderService;
     private static final int BOOK_LOAN_DAYS = 28;
-    private final ReminderService  reminderService;
+
     public BorrowingService(UserRepository userRepository,
                             BookRepository bookRepository,
                             LoanRepository loanRepository,
                             TimeProvider timeProvider,
                             FineStrategy fineStrategy,
                             Observer emailNotifier) {
+
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.loanRepository = loanRepository;
         this.timeProvider = timeProvider;
         this.fineCalculator = new FineCalculator(fineStrategy, timeProvider);
-        reminderService=new ReminderService(loanRepository,timeProvider, userRepository);
-        reminderService.addObserver(emailNotifier);
 
+        reminderService = new ReminderService(loanRepository, timeProvider, userRepository);
+        reminderService.addObserver(emailNotifier);
     }
-    void remindOverdue(){
+
+    void remindOverdue() {
         reminderService.sendOverdueNotifications();
     }
+
     public Pair<Boolean, String> borrowBook(String username, int bookId) {
-        if (username == null || username.isEmpty()) return new Pair<>(false, "Invalid user");
+        Pair<Boolean, String> result = validateBorrowRequest(username, bookId);
+        if (Boolean.FALSE.equals(result.first)) return result;
+
         User user = userRepository.getUserByUsername(username);
-        if (user == null) return new Pair<>(false, "User not found");
-
-        if (user.getFineBalance() > 0) {
-            return new Pair<>(false, "Cannot borrow: outstanding fine balance = " + user.getFineBalance());
-        }
-
-        List<Loan> userLoans = loanRepository.getLoansByUserId(user.getId());
         LocalDate today = timeProvider.today();
-        boolean hasOverdue = userLoans.stream().anyMatch(l -> l.isOverdue(today) && !l.isReturned());
-        if (hasOverdue) {
-            return new Pair<>(false, "Cannot borrow: you have overdue book(s).");
-        }
+        LocalDate dueDate = today.plusDays(BOOK_LOAN_DAYS);
+
+        Loan loan = new Loan(user.getId(), bookId, today, dueDate);
+        loanRepository.addLoan(loan);
 
         Book book = bookRepository.getBookById(bookId);
-        if (book == null) return new Pair<>(false, "Book not found");
-        if (book.isBorrowed()) return new Pair<>(false, "Book is already borrowed");
-
-        LocalDate borrowDate = today;
-        LocalDate dueDate = borrowDate.plus(BOOK_LOAN_DAYS, ChronoUnit.DAYS);
-        Loan loan = new Loan(user.getId(), bookId, borrowDate, dueDate);
-        boolean added = loanRepository.addLoan(loan);
-        if (!added) return new Pair<>(false, "Failed to record loan");
-
         book.setBorrowed(true);
-        user.addLoanId(loan.getId());
 
-        return new Pair<>(true, "Book borrowed successfully. Due date: " + dueDate.toString());
+        user.addLoanId(loan.getId());
+        return new Pair<>(true, "Book borrowed successfully. Due date: " + dueDate);
     }
 
     public Pair<Boolean, String> returnBook(String loanId) {
@@ -71,23 +60,8 @@ public class BorrowingService {
         loan.setReturnedDate(today);
 
         int fine = fineCalculator.computeFineForLoan(loan);
-        loan.setFineApplied(fine);
-        if (fine > 0) {
-            User user = userRepository.getUserById(loan.getUserId());
-            if (user != null) {
-                user.addFine(fine);
-            }
-            loan.setFinePaid(false);
-        } else {
-            loan.setFinePaid(true);
-        }
-
-        loanRepository.updateLoan(loan);
-        Book book = bookRepository.getBookById(loan.getBookId());
-        if (book != null) book.setBorrowed(false);
-
-        User user = userRepository.getUserById(loan.getUserId());
-        if (user != null) user.removeLoanId(loan.getId());
+        applyFine(loan, fine);
+        updateStatusAfterReturn(loan);
 
         return new Pair<>(true, "Book returned. Applied fine: " + fine + " NIS");
     }
@@ -101,11 +75,45 @@ public class BorrowingService {
 
         int before = user.getFineBalance();
         user.payFine(amount);
-        int after = user.getFineBalance();
 
-        String msg = "Paid " + amount + " NIS. Balance before: " + before + ", now: " + after;
-        return new Pair<>(true, msg);
+        return new Pair<>(true,
+                "Paid " + amount + " NIS. Balance before: " + before + ", now: " + user.getFineBalance());
     }
 
-}
+    private Pair<Boolean, String> validateBorrowRequest(String username, int bookId) {
+        if (username == null || username.isEmpty()) return new Pair<>(false, "Invalid user");
 
+        User user = userRepository.getUserByUsername(username);
+        if (user == null) return new Pair<>(false, "User not found");
+
+        if (user.getFineBalance() > 0)
+            return new Pair<>(false, "Cannot borrow: outstanding fine = " + user.getFineBalance());
+
+        LocalDate today = timeProvider.today();
+        boolean overdue = loanRepository.getLoansByUserId(user.getId())
+                .stream()
+                .anyMatch(l -> !l.isReturned() && l.isOverdue(today));
+
+        if (overdue) return new Pair<>(false, "Cannot borrow: you have overdue book(s).");
+
+        Book book = bookRepository.getBookById(bookId);
+        if (book == null) return new Pair<>(false, "Book not found");
+        if (book.isBorrowed()) return new Pair<>(false, "Book is already borrowed");
+
+        return new Pair<>(true, "");
+    }
+
+    private void applyFine(Loan loan, int fine) {
+        loan.setFineApplied(fine);
+        loan.setFinePaid(fine == 0);
+
+        if (fine > 0) {
+            User user = userRepository.getUserById(loan.getUserId());
+            if (user != null) user.addFine(fine);
+        }
+    }
+
+    private void updateStatusAfterReturn(Loan loan) {
+        MediaBorrowingService.returnMediaHelper(loan, loanRepository, bookRepository, userRepository);
+    }
+}

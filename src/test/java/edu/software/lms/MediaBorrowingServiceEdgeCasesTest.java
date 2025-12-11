@@ -180,8 +180,7 @@ public class MediaBorrowingServiceEdgeCasesTest {
             }
 
             @Override
-            public boolean updateLoan(Loan loan) {
-                return false;
+            public void updateLoan(Loan loan) {
             }
         };
 

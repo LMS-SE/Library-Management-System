@@ -2,7 +2,6 @@ package edu.software.lms;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class InMemoryLoanRepository implements LoanRepository {
     private final List<Loan> loans = new ArrayList<>();
@@ -16,7 +15,9 @@ public class InMemoryLoanRepository implements LoanRepository {
     @Override
     public List<Loan> getLoansByUserId(String userId) {
         if (userId == null) return new ArrayList<>();
-        return loans.stream().filter(l -> userId.equals(l.getUserId())).collect(Collectors.toList());
+        return loans.stream()
+                .filter(l -> userId.equals(l.getUserId()))
+                .toList();
     }
 
     @Override
@@ -33,14 +34,13 @@ public class InMemoryLoanRepository implements LoanRepository {
     }
 
     @Override
-    public boolean updateLoan(Loan loan) {
-        if (loan == null) return false;
+    public void updateLoan(Loan loan) {
+        if (loan == null) return;
         for (int i = 0; i < loans.size(); i++) {
             if (loans.get(i).getId().equals(loan.getId())) {
                 loans.set(i, loan);
-                return true;
+                return;
             }
         }
-        return false;
     }
 }

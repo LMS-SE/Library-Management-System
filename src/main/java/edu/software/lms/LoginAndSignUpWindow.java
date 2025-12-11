@@ -3,7 +3,7 @@ package edu.software.lms;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-public class LoginAndSignUpWindow implements Window {
+public final class LoginAndSignUpWindow implements Window {
     private static final Logger logger = Logger.getLogger(LoginAndSignUpWindow.class.getName());
     private static final Scanner scanner = new Scanner(System.in);
     private final UserService userService;

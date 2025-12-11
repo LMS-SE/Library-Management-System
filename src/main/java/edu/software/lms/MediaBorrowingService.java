@@ -29,8 +29,8 @@ public class MediaBorrowingService {
         if (user.getFineBalance() > 0) return new Pair<>(false, "Cannot borrow: outstanding fine balance = " + user.getFineBalance());
 
         List<Loan> userLoans = loanRepository.getLoansByUserId(user.getId());
-        LocalDate today = timeProvider.today();
-        boolean hasOverdue = userLoans.stream().anyMatch(l -> l.isOverdue(today) && !l.isReturned());
+        LocalDate borrowDate = timeProvider.today();
+        boolean hasOverdue = userLoans.stream().anyMatch(l -> l.isOverdue(borrowDate) && !l.isReturned());
         if (hasOverdue) return new Pair<>(false, "Cannot borrow: you have overdue item(s).");
 
         Book book = bookRepository.getBookById(mediaId);
@@ -39,7 +39,6 @@ public class MediaBorrowingService {
 
         MediaType mt = (book instanceof CD) ? MediaType.CD : MediaType.BOOK;
         int days = (mt == MediaType.CD) ? CD_LOAN_DAYS : BOOK_LOAN_DAYS;
-        LocalDate borrowDate = today;
         LocalDate dueDate = borrowDate.plusDays(days);
 
         MediaLoan loan = new MediaLoan(user.getId(), mediaId, borrowDate, dueDate, mt);
@@ -48,7 +47,7 @@ public class MediaBorrowingService {
 
         book.setBorrowed(true);
         user.addLoanId(loan.getId());
-        return new Pair<>(true, "Media borrowed successfully. Due date: " + dueDate.toString());
+        return new Pair<>(true, "Media borrowed successfully. Due date: " + dueDate);
     }
 
     public Pair<Boolean, String> returnMedia(String loanId) {
@@ -61,8 +60,8 @@ public class MediaBorrowingService {
 
         // determine media type (default BOOK)
         MediaType mt = MediaType.BOOK;
-        if (loan instanceof MediaLoan) {
-            mt = ((MediaLoan) loan).getMediaType();
+        if (loan instanceof MediaLoan mediaLoan) {
+            mt = mediaLoan.getMediaType();
         } else {
             // try to detect by inspecting book repository (fallback)
             Book b = bookRepository.getBookById(loan.getBookId());
@@ -85,14 +84,18 @@ public class MediaBorrowingService {
             loan.setFinePaid(true);
         }
 
+        returnMediaHelper(loan, loanRepository, bookRepository, userRepository);
+
+        return new Pair<>(true, "Media returned. Applied fine: " + fine + " NIS");
+    }
+
+    static void returnMediaHelper(Loan loan, LoanRepository loanRepository, BookRepository bookRepository, UserRepository userRepository) {
         loanRepository.updateLoan(loan);
         Book book = bookRepository.getBookById(loan.getBookId());
         if (book != null) book.setBorrowed(false);
 
         User user = userRepository.getUserById(loan.getUserId());
         if (user != null) user.removeLoanId(loan.getId());
-
-        return new Pair<>(true, "Media returned. Applied fine: " + fine + " NIS");
     }
 
 }

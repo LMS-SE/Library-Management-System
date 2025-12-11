@@ -12,10 +12,7 @@ public class InMemoryUserRepository implements UserRepository {
         this.users = new ArrayList<>();
     }
 
-    public InMemoryUserRepository(List<User> initial) {
-        this.users = new ArrayList<>();
-        if (initial != null) this.users.addAll(initial);
-    }
+
 
     @Override
     public User getUserById(String id) {
