@@ -1,7 +1,6 @@
 package edu.software.lms;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class BorrowingService {
@@ -81,12 +80,7 @@ public class BorrowingService {
             loan.setFinePaid(true);
         }
 
-        loanRepository.updateLoan(loan);
-        Book book = bookRepository.getBookById(loan.getBookId());
-        if (book != null) book.setBorrowed(false);
-
-        User user = userRepository.getUserById(loan.getUserId());
-        if (user != null) user.removeLoanId(loan.getId());
+        MediaBorrowingService.returnMediaHelper(loan, loanRepository, bookRepository, userRepository);
 
         return new Pair<>(true, "Book returned. Applied fine: " + fine + " NIS");
     }
