@@ -24,7 +24,10 @@ public class Book {
                 getAuthor().equals(book.getAuthor()) &&
                 getIsbn().equals(book.getIsbn());
     }
-
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(getId(), getName(), getAuthor(), getIsbn());
+    }
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
