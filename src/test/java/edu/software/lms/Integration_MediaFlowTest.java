@@ -51,4 +51,6 @@ public class Integration_MediaFlowTest {
         User after = ur.getUserByUsername(u.getUsername());
         assertEquals(0, after.getFineBalance());
     }
+
+
 }

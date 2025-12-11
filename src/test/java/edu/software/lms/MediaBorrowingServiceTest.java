@@ -57,7 +57,6 @@ public class MediaBorrowingServiceTest {
         Loan loan = lr.getAllLoans().get(0);
         assertEquals(tp.today().plusDays(7), loan.getDueDate());
 
-        // move time forward: borrowed day + 12 => overdue 5 days (7 loan days -> overdue 5)
         tp.plusDays(12);
         Pair<Boolean,String> ret = mbs.returnMedia(loan.getId());
         assertTrue(ret.first);

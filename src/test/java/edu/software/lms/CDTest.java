@@ -14,8 +14,25 @@ public class CDTest {
 
         Book fetched = repo.getBookById(100);
         assertNotNull(fetched);
-        assertTrue(fetched instanceof CD, "Fetched item should be a CD instance");
+        assertInstanceOf(CD.class, fetched, "Fetched item should be a CD instance");
         assertEquals("Best Of", fetched.getName());
         assertFalse(fetched.isBorrowed());
+    }
+    @Test
+    void testToString_notBorrowed() {
+        CD cd = new CD(10, "MegaHits", "Various Artists", "CD-10");
+        cd.setBorrowed(false);
+
+        String expected = "CD{id=10, title='MegaHits', author='Various Artists', isbn='CD-10', borrowed=false}";
+        assertEquals(expected, cd.toString());
+    }
+
+    @Test
+    void testToString_borrowedTrue() {
+        CD cd = new CD(20, "Rock Legends", "Best Band", "CD-20");
+        cd.setBorrowed(true);
+
+        String expected = "CD{id=20, title='Rock Legends', author='Best Band', isbn='CD-20', borrowed=true}";
+        assertEquals(expected, cd.toString());
     }
 }

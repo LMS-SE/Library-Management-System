@@ -107,11 +107,5 @@ public class BorrowingService {
         return new Pair<>(true, msg);
     }
 
-    public java.util.List<Loan> detectOverdueLoans() {
-        LocalDate today = timeProvider.today();
-        return loanRepository.getAllLoans().stream()
-                .filter(l -> !l.isReturned() && l.isOverdue(today))
-                .toList();
-    }
 }
 

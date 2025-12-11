@@ -97,4 +97,27 @@ class InMemoryBooksTest {
         Book book = inMemoryBooks.getBookById(2);
         assertNull(book);
     }
+    @Test
+    void getNextIdWhenEmpty() {
+        InMemoryBooks emptyRepo = new InMemoryBooks();
+        int nextId = emptyRepo.getNextId();
+        assertEquals(1, nextId);
+    }
+
+    @Test
+    void getNextIdWhenBooksExist() {
+        // Already added book with id = 1 in @BeforeEach
+        int nextId = inMemoryBooks.getNextId();
+        assertEquals(2, nextId);
+    }
+
+    @Test
+    void getNextIdWithMultipleBooks() {
+        inMemoryBooks.addBook(new Book(5, "DS", "John", "555"));
+        inMemoryBooks.addBook(new Book(3, "Algo", "Bill", "999"));
+
+        int nextId = inMemoryBooks.getNextId();
+        assertEquals(6, nextId);
+    }
+
 }

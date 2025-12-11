@@ -5,8 +5,7 @@ public class Book {
     private String name;
     private String author;
     private String isbn;
-    private boolean borrowed; // هل الكتاب معار الآن
-
+    private boolean borrowed;
     public Book(int id, String name, String author, String isbn) {
         this.id = id;
         this.name = name;

@@ -14,8 +14,8 @@ public class UserBookOperations implements Window{
     public UserBookOperations(UserService userService) {
         Observer emailNotifier = new EmailNotifier();
         this.userService = userService;
-        this.bookRepo = GettingRepoService.resolveRepoFromUserServiceOrFallback(userService);
-        LoanRepository loanRepo = GettingRepoService.resolveLoanRepoFromUserServiceOrFallback(userService);
+        this.bookRepo = userService.getBookRepository();
+        LoanRepository loanRepo = userService.getLoanRepository();
 
         this.borrowingService = new BorrowingService(userService.getUserRepository(), bookRepo, loanRepo, new SystemTimeProvider(), new BookFineStrategy(), emailNotifier);
 
@@ -108,18 +108,37 @@ public class UserBookOperations implements Window{
 
         printMenu();
         String choice = scanner.nextLine().trim();
-        switch (choice) {
-            case "1" -> { BookService.searchBookFlow(bookRepo); return this; }
-            case "2" -> { borrowFlow(); return this; }
-            case "3" -> { returnFlow(); return this; }
-            case "4" -> { viewMyLoansFlow(); return this; }
-            case "5" -> { payFineFlow(); return this; }
-            case "back" -> { System.out.println("logging out..."); return WindowFactory.create(NextWindow.LOGIN_AND_SIGNUP, userService); }
-            case "0" -> { return WindowFactory.create(NextWindow.EXIT, userService); }
-            default -> { System.out.println("Invalid choice. Try again."); return this; }
-        }
+        return getWindow(choice);
     }
 
+    private Window getWindow(String choice) {
+        switch (choice) {
+            case "1" -> { BookService.searchBookFlow(bookRepo);
+                return this;
+            }
+            case "2" -> { borrowFlow();
+                return this;
+            }
+            case "3" -> { returnFlow();
+                return this;
+            }
+            case "4" -> { viewMyLoansFlow();
+                return this;
+            }
+            case "5" -> { payFineFlow();
+                return this;
+            }
+            case "back" -> { System.out.println("logging out...");
+                return WindowFactory.create(NextWindow.LOGIN_AND_SIGNUP, userService);
+            }
+            case "0" -> {
+                return WindowFactory.create(NextWindow.EXIT, userService);
+            }
+            default -> { System.out.println("Invalid choice. Try again.");
+                return this;
+            }
+        }
+    }
 
 
 }

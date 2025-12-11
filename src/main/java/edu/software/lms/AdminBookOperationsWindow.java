@@ -15,8 +15,8 @@ public class AdminBookOperationsWindow implements Window {
     public AdminBookOperationsWindow(UserService userService) {
         Observer emailNotifier = new EmailNotifier();
         this.userService = userService;
-        this.bookRepo = GettingRepoService.resolveRepoFromUserServiceOrFallback(userService);
-        LoanRepository loanRepo = GettingRepoService.resolveLoanRepoFromUserServiceOrFallback(userService);
+        this.bookRepo = userService.getBookRepository();
+        LoanRepository loanRepo = userService.getLoanRepository();
         this.borrowingService = new BorrowingService(userService.getUserRepository(), bookRepo, loanRepo, new SystemTimeProvider(), new BookFineStrategy(), emailNotifier);
     }
 
