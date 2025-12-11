@@ -55,6 +55,13 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*$MockitoMock$*</exclude>
+                        <exclude>**/*$auxiliary$*</exclude>
+                        <exclude>com/sun/tools/attach/*</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
             <!-- Surefire (needed for JUnit5) -->
