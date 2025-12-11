@@ -12,30 +12,28 @@ class BorrowingServiceTest {
     private UserRepository users;
     private BookRepository books;
     private LoanRepository loans;
-    private TimeProvider time;
-    private FineStrategy strategy;
     private BorrowingService service;
 
     @BeforeEach
-    public void init() {
+    void init() {
         users = new InMemoryUserRepository();
         books = new InMemoryBooks();
         loans = new InMemoryLoanRepository();
-        time = () -> LocalDate.of(2024, 1, 1); // ثابت للتست
-        strategy = days -> days * 1; // 1 NIS لكل يوم
+        TimeProvider time = () -> LocalDate.of(2024, 1, 1); // ثابت للتست
+        FineStrategy strategy = days -> days; // 1 NIS لكل يوم
         service = new BorrowingService(users, books, loans, time, strategy,null);
     }
 
     // ------------------ Borrow tests ----------------------
 
     @Test
-    public void testBorrowUserNotFound() {
+    void testBorrowUserNotFound() {
         var r = service.borrowBook("XXX", 1);
         assertFalse(r.first);
     }
 
     @Test
-    public void testBorrowBookNotFound() {
+    void testBorrowBookNotFound() {
         User u = new User("John", "123","john@gmail.com",false);
         u.setId("U1");
         users.addUser(u);
@@ -45,7 +43,7 @@ class BorrowingServiceTest {
     }
 
     @Test
-    public void testBorrowBookAlreadyBorrowed() {
+    void testBorrowBookAlreadyBorrowed() {
         User u = new User("John", "123","john@gmail.com",false);
         u.setId("U1");
         users.addUser(u);
@@ -59,7 +57,7 @@ class BorrowingServiceTest {
     }
 
     @Test
-    public void testSuccessfulBorrow() {
+    void testSuccessfulBorrow() {
         User u = new User("John", "123","john@gmail.com",false);
         u.setId("U1");
         users.addUser(u);
@@ -73,13 +71,13 @@ class BorrowingServiceTest {
     // ------------------ Return tests ----------------------
 
     @Test
-    public void testReturnLoanNotFound() {
+    void testReturnLoanNotFound() {
         var r = service.returnBook("NOPE");
         assertFalse(r.first);
     }
 
     @Test
-    public void testReturnAlreadyReturned() {
+    void testReturnAlreadyReturned() {
         User u = new User("John", "123","john@gmail.com",false);
         u.setId("U1");
         users.addUser(u);
@@ -105,13 +103,13 @@ class BorrowingServiceTest {
     // ------------------ Payment tests ----------------------
 
     @Test
-    public void testPayFineUserNotFound() {
+    void testPayFineUserNotFound() {
         var r = service.payFine("UNKNOWN", 50);
         assertFalse(r.first);
     }
 
     @Test
-    public void testPayFineInvalidAmount() {
+    void testPayFineInvalidAmount() {
         User u = new User("John", "123","john@gmail.com",false);
         users.addUser(u);
 
@@ -120,7 +118,7 @@ class BorrowingServiceTest {
     }
 
     @Test
-    public void testPayFineSuccess() {
+    void testPayFineSuccess() {
         User u = new User("John", "123","john@gmail.com",false);
         u.setId("U1");
         users.addUser(u);

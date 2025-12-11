@@ -2,7 +2,7 @@ package edu.software.lms;
 
 public class Book {
     private int id;
-    private String name;
+    private final String name;
     private String author;
     private String isbn;
     private boolean borrowed;
@@ -32,7 +32,6 @@ public class Book {
     public void setId(int id) { this.id = id; }
 
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
 
     public String getAuthor() { return author; }
     public void setAuthor(String author) { this.author = author; }
