@@ -4,17 +4,50 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Utility service class providing functionality for searching and printing
+ * book or CD information. This class is not instantiable and exposes
+ * only static helper methods used across the system.
+ *
+ * <p>BookService handles interactive user input for searching by title,
+ * author, or ISBN and prints formatted details for books.</p>
+ */
 public final class BookService {
 
-    // Prevent instantiation
+    /** Logger instance for outputting menu and search messages. */
+    private static final Logger logger = Logger.getLogger(BookService.class.getName());
+
+    /** Scanner used for reading user input (replaceable for tests). */
+    private static Scanner scanner = new Scanner(System.in);
+
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
     private BookService() { }
 
-    private static final Logger logger = Logger.getLogger(BookService.class.getName());
-    private static Scanner scanner = new Scanner(System.in);
+    /**
+     * Used in tests to replace the input scanner.
+     *
+     * @param testScanner scanner instance used for injecting test input
+     */
     static void setScanner(Scanner testScanner) {
         scanner = testScanner;
     }
 
+    /**
+     * Interactive search flow allowing the user to search for a book by:
+     * <ul>
+     *     <li>Title</li>
+     *     <li>Author</li>
+     *     <li>ISBN</li>
+     * </ul>
+     *
+     * <p>The method prints search options, reads user input,
+     * performs a lookup using the provided {@link BookRepository},
+     * and prints search results.</p>
+     *
+     * @param bookRepo repository used for searching books and CDs
+     */
     public static void searchBookFlow(BookRepository bookRepo) {
 
         logger.info("Search by: 1-Title  2-Author  3-ISBN");
@@ -42,6 +75,22 @@ public final class BookService {
         }
     }
 
+    /**
+     * Prints the details of a given {@link Book} or {@link CD} in a formatted style.
+     * If the book is null, a "No result found" message is displayed.
+     *
+     * <p>The output includes:
+     * <ul>
+     *     <li>ID</li>
+     *     <li>Type (Book or CD)</li>
+     *     <li>Title</li>
+     *     <li>Author</li>
+     *     <li>ISBN</li>
+     *     <li>Borrowed status</li>
+     * </ul></p>
+     *
+     * @param b the book to print, or null if no book was found
+     */
     public static void printBook(Book b) {
 
         if (b == null) {

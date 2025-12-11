@@ -3,17 +3,35 @@ package edu.software.lms;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
-
+/**
+ * Represents the admin window for performing book-related operations
+ * such as adding new media items, listing all books, searching books,
+ * sending overdue notifications, and unregistering users.
+ *
+ * <p>This class is used only when the logged-in user is an administrator.
+ * It interacts with {@link UserService}, {@link BookRepository},
+ * {@link BorrowingService}, and various other components.</p>
+ */
 public class AdminBookOperationsWindow implements Window {
     private static Scanner scanner = new Scanner(System.in);
     private static final Logger logger = Logger.getLogger(AdminBookOperationsWindow.class.getName());
     private final UserService userService;
     private final BookRepository bookRepo;
     private final BorrowingService borrowingService;
+
+    /**
+     * Sets the scanner instance (used in tests).
+     *
+     * @param testScanner scanner to inject for testing
+     */
     static void setScanner(Scanner testScanner) {
         scanner = testScanner;
     }
-
+    /**
+     * Constructs a new admin operations window.
+     *
+     * @param userService the user service providing repositories and authentication context
+     */
     public AdminBookOperationsWindow(UserService userService) {
         Observer emailNotifier = new EmailNotifier();
         this.userService = userService;
@@ -28,11 +46,15 @@ public class AdminBookOperationsWindow implements Window {
                 emailNotifier
         );
     }
-
+    /**
+     * Prints the header banner for admin operations.
+     */
     private void printHeader() {
         logger.info("\n=== Admin Book Operations ===");
     }
-
+    /**
+     * Prints the menu options available to the administrator.
+     */
     private void printMenu() {
         logger.info("Choose an option:");
         logger.info("1) Add book / CD");
@@ -44,7 +66,10 @@ public class AdminBookOperationsWindow implements Window {
         logger.info("0) Exit application");
         logger.info("Choice: ");
     }
-
+    /**
+     * Handles the flow of adding either a Book or CD into the repository.
+     * Validates fields and inserts the item into the system.
+     */
     private void addBookFlow() {
         logger.info("Is this a CD? (y/N): ");
         String isCd = scanner.nextLine().trim();
@@ -70,13 +95,20 @@ public class AdminBookOperationsWindow implements Window {
         if (added) logger.info("Item added successfully.");
         else logger.warning("Failed to add (maybe duplicate id or ISBN).");
     }
-
+    /**
+     * Prints all books (and CDs) stored in the repository.
+     * Displays an informative message if no entries exist.
+     */
     private void listAllBooks() {
         List<Book> all = bookRepo.getAllBooks();
         if (all.isEmpty()) logger.info("No items available.");
         else all.forEach(BookService::printBook);
     }
-
+    /**
+     * Processes the admin's choice and returns the next window to display.
+     *
+     * @return the next window instance or {@code null} if exiting
+     */
     @Override
     public Window buildNextWindow() {
         printHeader();
@@ -116,7 +148,10 @@ public class AdminBookOperationsWindow implements Window {
             }
         }
     }
-
+    /**
+     * Handles the process of unregistering a user, only available to admins.
+     * Validates permissions, checks user existence, active loans, and unpaid fines.
+     */
     private void unregisterUserFlow() {
         User admin = userService.getCurrentUser();
         if (admin == null) {
