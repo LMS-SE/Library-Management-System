@@ -15,8 +15,8 @@ public class AdminBookOperationsWindow implements Window {
     public AdminBookOperationsWindow(UserService userService) {
         Observer emailNotifier = new EmailNotifier();
         this.userService = userService;
-        this.bookRepo = GettingRepoService.resolveRepoFromUserServiceOrFallback(userService);
-        LoanRepository loanRepo = GettingRepoService.resolveLoanRepoFromUserServiceOrFallback(userService);
+        this.bookRepo = userService.getBookRepository();
+        LoanRepository loanRepo = userService.getLoanRepository();
         this.borrowingService = new BorrowingService(
                 userService.getUserRepository(),
                 bookRepo,
@@ -24,12 +24,9 @@ public class AdminBookOperationsWindow implements Window {
                 new SystemTimeProvider(),
                 new BookFineStrategy(),
                 emailNotifier
-        );
-    }
+        );    }
 
-    private void printHeader() {
-        logger.info("\n=== Admin Book Operations ===");
-    }
+    private void printHeader() { logger.info("\n=== Admin Book Operations ==="); }
 
     private void printMenu() {
         logger.info("Choose an option:");
@@ -40,21 +37,21 @@ public class AdminBookOperationsWindow implements Window {
         logger.info("5) Unregister user");
         logger.info("back) Log out");
         logger.info("0) Exit application");
-        logger.info("Choice:");
+        logger.info("Choice: ");
     }
 
     private void addBookFlow() {
-        logger.info("Is this a CD? (y/N):");
+        System.out.print("Is this a CD? (y/N): ");
         String isCd = scanner.nextLine().trim();
         boolean cd = isCd.equalsIgnoreCase("y");
 
-        logger.info("Enter title:");
+        System.out.print("Enter title: ");
         String title = scanner.nextLine().trim();
 
-        logger.info("Enter author:");
+        System.out.print("Enter author: ");
         String author = scanner.nextLine().trim();
 
-        logger.info("Enter ISBN:");
+        System.out.print("Enter ISBN: ");
         String isbn = scanner.nextLine().trim();
 
         if (title.isEmpty() || author.isEmpty() || isbn.isEmpty()) {
@@ -64,21 +61,15 @@ public class AdminBookOperationsWindow implements Window {
 
         int nextId = bookRepo.getNextId();
         Book book = cd ? new CD(nextId, title, author, isbn) : new Book(nextId, title, author, isbn);
-
         boolean added = bookRepo.addBook(book);
-        if (added)
-            logger.info("Item added successfully.");
-        else
-            logger.warning("Failed to add (maybe duplicate id or ISBN).");
+        if (added) logger.info("Item added successfully.");
+        else logger.warning("Failed to add (maybe duplicate id or ISBN).");
     }
 
     private void listAllBooks() {
         List<Book> all = bookRepo.getAllBooks();
-        if (all.isEmpty()) {
-            logger.info("No items available.");
-        } else {
-            all.forEach(BookService::printBook);
-        }
+        if (all.isEmpty()) logger.info("No items available.");
+        else all.forEach(BookService::printBook);
     }
 
     @Override
@@ -86,37 +77,23 @@ public class AdminBookOperationsWindow implements Window {
         printHeader();
         printMenu();
         String choice = scanner.nextLine().trim();
-
         switch (choice) {
             case "1" -> { addBookFlow(); return this; }
             case "2" -> { BookService.searchBookFlow(bookRepo); return this; }
             case "3" -> { listAllBooks(); return this; }
             case "4" -> { borrowingService.remindOverdue(); return this; }
             case "5" -> { unregisterUserFlow(); return this; }
-            case "back" -> {
-                logger.info("Logging out...");
-                return WindowFactory.create(NextWindow.LOGIN_AND_SIGNUP, userService);
-            }
-            case "0" -> {
-                return WindowFactory.create(NextWindow.EXIT, userService);
-            }
-            default -> {
-                logger.warning("Invalid choice. Try again.");
-                return this;
-            }
+            case "back" -> { logger.info("Logging out..."); return WindowFactory.create(NextWindow.LOGIN_AND_SIGNUP, userService); }
+            case "0" -> { return WindowFactory.create(NextWindow.EXIT, userService); }
+            default -> { logger.warning("Invalid choice. Try again."); return this; }
         }
     }
 
     private void unregisterUserFlow() {
         User admin = userService.getCurrentUser();
-        if (admin == null) {
-            logger.warning("No user logged in.");
-            return;
-        }
-
-        logger.info("Enter username to unregister:");
+        if (admin == null) { logger.warning("No user logged in."); return; }
+        System.out.print("Enter username to unregister: ");
         String target = scanner.nextLine().trim();
-
         Pair<Boolean, String> result = userService.unregisterUser(target);
         logger.info(result.second);
     }

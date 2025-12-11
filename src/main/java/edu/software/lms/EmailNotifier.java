@@ -12,6 +12,7 @@ public class EmailNotifier implements Observer {
         String formatted = "To: " + user.getEmail() + " | " + message;
 
         sentMessages.add(formatted);
+
     }
 
     

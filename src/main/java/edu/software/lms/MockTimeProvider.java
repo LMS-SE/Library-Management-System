@@ -7,6 +7,5 @@ public class MockTimeProvider implements TimeProvider {
     public MockTimeProvider(LocalDate start) { this.current = start; }
     @Override public LocalDate today() { return current; }
     public void plusDays(long days) { current = current.plusDays(days); }
-    public void setDate(LocalDate d) { this.current = d; }
 }
 

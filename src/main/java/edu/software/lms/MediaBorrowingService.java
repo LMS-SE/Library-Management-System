@@ -95,10 +95,4 @@ public class MediaBorrowingService {
         return new Pair<>(true, "Media returned. Applied fine: " + fine + " NIS");
     }
 
-    public java.util.List<Loan> detectOverdueMedia() {
-        LocalDate today = timeProvider.today();
-        return loanRepository.getAllLoans().stream()
-                .filter(l -> !l.isReturned() && l.isOverdue(today))
-                .toList();
-    }
 }
