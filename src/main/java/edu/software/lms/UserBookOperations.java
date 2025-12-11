@@ -4,12 +4,16 @@ import java.util.List;
 import java.util.Scanner;
 
 public class UserBookOperations implements Window{
-    private static final Scanner scanner = new Scanner(System.in);
+    static Scanner scanner = new Scanner(System.in);
     Logger logger = Logger.getLogger(getClass().getName());
     private final UserService userService;
     private final BookRepository bookRepo;
     private final BorrowingService borrowingService;
     private final MediaBorrowingService mediaBorrowingService;
+    // for tests
+    static void setScanner(Scanner testScanner) {
+        scanner = testScanner;
+    }
 
     public UserBookOperations(UserService userService) {
         Observer emailNotifier = new EmailNotifier();
