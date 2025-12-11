@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class Integration_MediaFlowTest {
+class IntegrationMediaFlowTest {
 
     @Test
     void fullFlow_registerAddCdBorrowReturnAndPayFine() {
@@ -31,7 +31,7 @@ public class Integration_MediaFlowTest {
         MediaBorrowingService mbs = new MediaBorrowingService(ur, br, lr, tp);
         Pair<Boolean,String> borrow = mbs.borrowMedia(u.getUsername(), 50);
         assertTrue(borrow.first);
-        Loan loan = lr.getAllLoans().get(0);
+        Loan loan = lr.getAllLoans().getFirst();
 
         // advance time to make it overdue by 2 days
         tp.plusDays(9); // borrowed +9 => overdue 2

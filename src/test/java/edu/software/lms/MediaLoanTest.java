@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MediaLoanTest {
+class MediaLoanTest {
 
     @Test
     void mediaLoanCarriesMediaType_andBasicFields() {

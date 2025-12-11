@@ -1,9 +1,10 @@
 package edu.software.lms;
 import org.junit.jupiter.api.*;
 import java.time.LocalDate;
-public class LoanTest {
+
+class LoanTest {
     @Test
-    public void testOverdue() {
+    void testOverdue() {
         LocalDate borrow = LocalDate.of(2024,1,1);
         LocalDate due = LocalDate.of(2024,1,10);
         Loan loan = new Loan("U1", 1, borrow, due);
@@ -15,7 +16,7 @@ public class LoanTest {
 
 
     @Test
-    public void testReturnedOverdue() {
+    void testReturnedOverdue() {
         LocalDate borrow = LocalDate.of(2024,1,1);
         LocalDate due = LocalDate.of(2024,1,10);
         Loan loan = new Loan("U1", 1, borrow, due);
@@ -27,7 +28,7 @@ public class LoanTest {
 
 
     @Test
-    public void testOverdueDays() {
+    void testOverdueDays() {
         LocalDate borrow = LocalDate.of(2024,1,1);
         LocalDate due = LocalDate.of(2024,1,10);
         Loan loan = new Loan("U1", 1, borrow, due);

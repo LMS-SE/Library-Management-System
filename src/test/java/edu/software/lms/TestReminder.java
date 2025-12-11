@@ -1,14 +1,13 @@
 package edu.software.lms;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class TestReminder {
+class TestReminder {
     @Test
     void testReminderNotification() {
         // Arrange
@@ -41,7 +40,7 @@ public class TestReminder {
         reminder.sendOverdueNotifications();
 
         // Assert
-        verify(email).notify(eq(u), eq("You have 1 overdue book(s)."));
+        verify(email).notify(u, eq("You have 1 overdue book(s)."));
     }
     @Test
     void noOverdueLoans_noNotificationSent() {
@@ -110,7 +109,7 @@ public class TestReminder {
         reminder.sendOverdueNotifications();
 
         // Assert
-        verify(email).notify(eq(u), eq("You have 2 overdue book(s)."));
+        verify(email).notify(u, eq("You have 2 overdue book(s)."));
         verifyNoMoreInteractions(email);
     }
 
@@ -151,8 +150,8 @@ public class TestReminder {
         reminder.sendOverdueNotifications();
 
         // Assert
-        verify(email).notify(eq(u1), eq("You have 1 overdue book(s)."));
-        verify(email).notify(eq(u2), eq("You have 1 overdue book(s)."));
+        verify(email).notify(u1, eq("You have 1 overdue book(s)."));
+        verify(email).notify(u2, eq("You have 1 overdue book(s)."));
         verifyNoMoreInteractions(email);
     }
 

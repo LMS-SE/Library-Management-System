@@ -1,6 +1,5 @@
 package edu.software.lms;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,9 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class StrongPwdTest {
     private void assertStrong(String pwd)  { assertTrue (CustomUtilities.isStrongPassword(pwd)); }
     private void assertWeak  (String pwd)  { assertFalse(CustomUtilities.isStrongPassword(pwd)); }
-    @BeforeEach
-    void setUp() {
-    }
+
 
     @Test
     void isStrongPassword() {
