@@ -25,7 +25,7 @@ public class MediaReportService {
         sb.append("Overdue Report (").append(overdue.size()).append(" items)\n");
         for (Loan l : overdue) {
             MediaType mt = MediaType.BOOK;
-            if (l instanceof MediaLoan) mt = ((MediaLoan) l).getMediaType();
+            if (l instanceof MediaLoan mediaLoan) mt = mediaLoan.getMediaType();
             else {
                 Book b = bookRepository.getBookById(l.getBookId());
                 if (b instanceof CD) mt = MediaType.CD;

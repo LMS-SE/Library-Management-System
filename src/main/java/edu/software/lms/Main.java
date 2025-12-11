@@ -1,9 +1,9 @@
 package edu.software.lms;
-
+import java.util.logging.Logger;
 
 
 public class Main {
-
+    static Logger logger = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) {
         Window window= WindowFactory.create(NextWindow.LOGIN_AND_SIGNUP,new UserService());
@@ -12,6 +12,6 @@ public class Main {
 
             //factory pattern
         }
-        System.out.println("Thank you for using Our Library System!");
+        logger.info("Thank you for using Our Library System!");
     }
 }   

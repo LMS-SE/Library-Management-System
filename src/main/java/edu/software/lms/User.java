@@ -10,7 +10,7 @@ public class User {
     private String id;
     private int fineBalance; // NIS
     private String email;
-    private List<String> loanIds;
+    private final List<String> loanIds;
 
     public boolean isAdmin() {
         return isAdmin;
