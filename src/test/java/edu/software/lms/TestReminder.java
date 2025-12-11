@@ -40,7 +40,7 @@ class TestReminder {
         reminder.sendOverdueNotifications();
 
         // Assert
-        verify(email).notify(u, eq("You have 1 overdue book(s)."));
+        verify(email).notify(eq(u), eq("You have 1 overdue book(s)."));
     }
     @Test
     void noOverdueLoans_noNotificationSent() {
@@ -109,7 +109,7 @@ class TestReminder {
         reminder.sendOverdueNotifications();
 
         // Assert
-        verify(email).notify(u, eq("You have 2 overdue book(s)."));
+        verify(email).notify(eq(u), eq("You have 2 overdue book(s)."));
         verifyNoMoreInteractions(email);
     }
 
@@ -150,8 +150,8 @@ class TestReminder {
         reminder.sendOverdueNotifications();
 
         // Assert
-        verify(email).notify(u1, eq("You have 1 overdue book(s)."));
-        verify(email).notify(u2, eq("You have 1 overdue book(s)."));
+        verify(email).notify(eq(u1), eq("You have 1 overdue book(s)."));
+        verify(email).notify(eq(u2), eq("You have 1 overdue book(s)."));
         verifyNoMoreInteractions(email);
     }
 
