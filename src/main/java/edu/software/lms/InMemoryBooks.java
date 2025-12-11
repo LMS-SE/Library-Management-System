@@ -5,7 +5,7 @@ import java.util.List;
 
 public class InMemoryBooks implements BookRepository {
 
-    List<Book> books;
+    private final List<Book> books;
 
     public InMemoryBooks(List<Book> books) {
         this.books = books;
@@ -37,15 +37,19 @@ public class InMemoryBooks implements BookRepository {
 
     @Override
     public boolean addBook(Book book) {
-        if (book == null) {
-            return false;
-        }
-        if(books.stream().anyMatch(b -> (b.getId() == book.getId()||b.getIsbn().equals(book.getIsbn())))) {
-            return false;
-
-        }
-
+        if (book == null) return false;
+        if (books.stream().anyMatch(b -> b.getId() == book.getId() || b.getIsbn().equals(book.getIsbn()))) return false;
         books.add(book);
         return true;
+    }
+
+    @Override
+    public List<Book> getAllBooks() {
+        return new ArrayList<>(books);
+    }
+
+    @Override
+    public int getNextId() {
+        return books.stream().mapToInt(Book::getId).max().orElse(0) + 1;
     }
 }

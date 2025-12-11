@@ -1,12 +1,14 @@
 package edu.software.lms;
 
-
+import java.util.List;
 
 public interface BookRepository {
-    public Book getBookById(int id);
-    public Book getBookByName(String name);
-    public Book getBookByAuthor(String author);
-    public Book getBookByISBN(String isbn);
-    public boolean addBook(Book book);
+    Book getBookById(int id);
+    Book getBookByName(String name);
+    Book getBookByAuthor(String author);
+    Book getBookByISBN(String isbn);
+    boolean addBook(Book book);
 
+    List<Book> getAllBooks();
+    int getNextId();
 }

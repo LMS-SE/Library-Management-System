@@ -53,40 +53,17 @@ public class AdminBookOperationsWindow implements Window {
             return;
         }
 
-        int nextId = computeNextId();
-        Book book;
-        if (cd) book = new CD(nextId, title, author, isbn);
-        else book = new Book(nextId, title, author, isbn);
-
+        int nextId = bookRepo.getNextId();
+        Book book = cd ? new CD(nextId, title, author, isbn) : new Book(nextId, title, author, isbn);
         boolean added = bookRepo.addBook(book);
         if (added) logger.info("Item added successfully.");
         else logger.warning("Failed to add (maybe duplicate id or ISBN).");
     }
 
-    private int computeNextId() {
-        int nextId = 1;
-        if (bookRepo instanceof InMemoryBooks) {
-            List<Book> list = ((InMemoryBooks) bookRepo).books; // package-private
-            if (list != null && !list.isEmpty()) {
-                int max = 0;
-                for (Book b : list) if (b != null) max = Math.max(max, b.getId());
-                nextId = max + 1;
-            }
-        }
-        return nextId;
-    }
-
     private void listAllBooks() {
-        if (bookRepo instanceof InMemoryBooks) {
-            List<Book> all = ((InMemoryBooks) bookRepo).books;
-            if (all.isEmpty()) {
-                logger.info("No items available.");
-            } else {
-                for (Book b : all) BookService.printBook(b);
-            }
-        } else {
-            logger.warning("List-all not supported for this repository.");
-        }
+        List<Book> all = bookRepo.getAllBooks();
+        if (all.isEmpty()) logger.info("No items available.");
+        else all.forEach(BookService::printBook);
     }
 
     @Override
@@ -108,10 +85,7 @@ public class AdminBookOperationsWindow implements Window {
 
     private void unregisterUserFlow() {
         User admin = userService.getCurrentUser();
-        if (admin == null) {
-            logger.warning("No user logged in.");
-            return;
-        }
+        if (admin == null) { logger.warning("No user logged in."); return; }
         System.out.print("Enter username to unregister: ");
         String target = scanner.nextLine().trim();
         Pair<Boolean, String> result = userService.unregisterUser(target);
