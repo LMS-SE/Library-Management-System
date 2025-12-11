@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MediaBorrowingServiceTest {
+class MediaBorrowingServiceTest {
 
     @Test
     void borrowCd_andBook_haveCorrectDueDates() {
@@ -54,7 +54,7 @@ public class MediaBorrowingServiceTest {
 
         Pair<Boolean,String> borrowRes = mbs.borrowMedia("bob", 10);
         assertTrue(borrowRes.first);
-        Loan loan = lr.getAllLoans().get(0);
+        Loan loan = lr.getAllLoans().getFirst();
         assertEquals(tp.today().plusDays(7), loan.getDueDate());
 
         tp.plusDays(12);

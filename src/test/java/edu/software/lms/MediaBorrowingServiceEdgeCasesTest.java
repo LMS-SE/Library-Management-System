@@ -1,15 +1,20 @@
 package edu.software.lms;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.LocalDate;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MediaBorrowingServiceEdgeCasesTest {
+class MediaBorrowingServiceEdgeCasesTest {
 
-    @Test
-    void borrowMedia_failsForNullUsername() {
+    @ParameterizedTest
+    @MethodSource("invalidUserProvider")
+    void borrowMedia_invalidUsers_fail(String username, String expectedMessage) {
         InMemoryUserRepository ur = new InMemoryUserRepository();
         InMemoryBooks br = new InMemoryBooks();
         InMemoryLoanRepository lr = new InMemoryLoanRepository();
@@ -17,42 +22,19 @@ public class MediaBorrowingServiceEdgeCasesTest {
 
         MediaBorrowingService mbs = new MediaBorrowingService(ur, br, lr, tp);
 
-        Pair<Boolean, String> res = mbs.borrowMedia(null, 1);
+        Pair<Boolean, String> res = mbs.borrowMedia(username, 1);
 
         assertFalse(res.first);
-        assertEquals("Invalid user", res.second);
+        assertEquals(expectedMessage, res.second);
     }
 
-    @Test
-    void borrowMedia_failsForEmptyUsername() {
-        InMemoryUserRepository ur = new InMemoryUserRepository();
-        InMemoryBooks br = new InMemoryBooks();
-        InMemoryLoanRepository lr = new InMemoryLoanRepository();
-        MockTimeProvider tp = new MockTimeProvider(LocalDate.of(2025, 1, 1));
-
-        MediaBorrowingService mbs = new MediaBorrowingService(ur, br, lr, tp);
-
-        Pair<Boolean, String> res = mbs.borrowMedia("", 1);
-
-        assertFalse(res.first);
-        assertEquals("Invalid user", res.second);
+    private static Stream<Arguments> invalidUserProvider() {
+        return Stream.of(
+                Arguments.of(null, "Invalid user"),
+                Arguments.of("", "Invalid user"),
+                Arguments.of("missing", "User not found")
+        );
     }
-
-    @Test
-    void borrowMedia_failsWhenUserNotFound() {
-        InMemoryUserRepository ur = new InMemoryUserRepository();
-        InMemoryBooks br = new InMemoryBooks();
-        InMemoryLoanRepository lr = new InMemoryLoanRepository();
-        MockTimeProvider tp = new MockTimeProvider(LocalDate.of(2025, 1, 1));
-
-        MediaBorrowingService mbs = new MediaBorrowingService(ur, br, lr, tp);
-
-        Pair<Boolean, String> res = mbs.borrowMedia("missing", 1);
-
-        assertFalse(res.first);
-        assertEquals("User not found", res.second);
-    }
-
     @Test
     void borrowMedia_failsWhenUserHasOutstandingFine() {
         InMemoryUserRepository ur = new InMemoryUserRepository();
@@ -158,6 +140,15 @@ public class MediaBorrowingServiceEdgeCasesTest {
         Book book = new Book(1, "Book", "Author", "ISBN-1");
         br.addBook(book);
 
+        MediaBorrowingService mbs = getMediaBorrowingService(ur, br, tp);
+
+        Pair<Boolean, String> res = mbs.borrowMedia("kate", 1);
+
+        assertFalse(res.first);
+        assertEquals("Failed to record loan", res.second);
+    }
+
+    private static MediaBorrowingService getMediaBorrowingService(InMemoryUserRepository ur, InMemoryBooks br, MockTimeProvider tp) {
         LoanRepository failingLoanRepo = new LoanRepository() {
             @Override
             public boolean addLoan(Loan loan) {
@@ -185,12 +176,7 @@ public class MediaBorrowingServiceEdgeCasesTest {
             }
         };
 
-        MediaBorrowingService mbs = new MediaBorrowingService(ur, br, failingLoanRepo, tp);
-
-        Pair<Boolean, String> res = mbs.borrowMedia("kate", 1);
-
-        assertFalse(res.first);
-        assertEquals("Failed to record loan", res.second);
+        return new MediaBorrowingService(ur, br, failingLoanRepo, tp);
     }
 
     @Test

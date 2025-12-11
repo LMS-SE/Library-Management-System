@@ -3,7 +3,7 @@ package edu.software.lms;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestUnregisterUser {
+class TestUnregisterUser {
 
     private UserService setupService() {
         UserService svc = new UserService();
