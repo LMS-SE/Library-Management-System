@@ -1,82 +1,67 @@
 package edu.software.lms;
 
-
-
+import java.util.Scanner;
+import java.util.logging.Logger;
 
 public class LoginAndSignUpWindow implements Window {
-    UserService userService;
+    private static final Logger logger = Logger.getLogger(LoginAndSignUpWindow.class.getName());
+    private static final Scanner scanner = new Scanner(System.in);
+    private final UserService userService;
 
     public LoginAndSignUpWindow(UserService userService) {
         this.userService = userService;
-
     }
 
     @Override
     public Window buildNextWindow() {
-
         printMessage();
-        String choice = scanner.nextLine();
+        String choice = scanner.nextLine().trim();
         switch (choice) {
             case "1" -> {
                 return loginOperation();
             }
             case "2" -> {
-                return SignUpOperation();
+                return signUpOperation();
             }
             case "0" -> {
-                return WindowFactory.create(NextWindow.EXIT,userService);
+                return WindowFactory.create(NextWindow.EXIT, userService);
             }
             default -> {
-                System.out.println("Invalid choice. Try again.");
+                logger.warning("Invalid choice. Try again.");
                 return this;
             }
         }
     }
 
-
-    private void printMessage(){
-        System.out.println("\n===== Library System Menu =====");
-        System.out.println("1. Log In");
-        System.out.println("2. Sign Up");
-        System.out.println("0. Exit");
-        System.out.print("Enter choice: ");
+    private void printMessage() {
+        logger.info("\n===== Library System Menu =====");
+        logger.info("1. Log In");
+        logger.info("2. Sign Up");
+        logger.info("0. Exit");
+        logger.info("Enter choice: ");
     }
 
-    private Window SignUpOperation() {
-
+    private Window signUpOperation() {
         SignUpResult signUpResult;
-        while(true){
-            signUpResult=createAccountPrompt();
-            if(exitSignUp(signUpResult)){
-                break;
-            }
-            else {
-                System.out.println(signUpResult.message);
-            }
-        }
-        System.out.print(signUpResult.message);
-        if(signUpResult==SignUpResult.CANCEL_SIGNUP){
-            return this;
+        while (true) {
+            signUpResult = createAccountPrompt();
+            if (exitSignUp(signUpResult)) break;
+            else logger.info(signUpResult.message);
         }
 
-        return WindowFactory.create(NextWindow.USER_BOOK_OPERATIONS,userService);
+        if (signUpResult == SignUpResult.CANCEL_SIGNUP) return this;
+        return WindowFactory.create(NextWindow.USER_BOOK_OPERATIONS, userService);
     }
 
     private Window loginOperation() {
-        LoginResult loginResult;
-        while(true){
-            loginResult= logInPrompt();
-            if(exitLogin(loginResult)){
-                break;
-            }
-            else {
-                System.out.println(loginResult.message);
-            }
+        LoginResult loginResult = null;
+        while (true) {
+            loginResult = logInPrompt();
+            if (exitLogin(loginResult)) break;
+            else logger.info(loginResult.message);
         }
-        System.out.print(loginResult.message);
-        if(loginResult==LoginResult.CANCEL_LOGIN){
-            return this;
-        }
+
+        if (loginResult == LoginResult.CANCEL_LOGIN) return this;
         if (userService.getCurrentUser().isAdmin()) {
             return WindowFactory.create(NextWindow.ADMIN_BOOK_OPERATIONS, userService);
         }
@@ -84,45 +69,34 @@ public class LoginAndSignUpWindow implements Window {
     }
 
     private boolean exitSignUp(SignUpResult signUpResult) {
-        boolean cancelled=signUpResult==SignUpResult.CANCEL_SIGNUP;
-        boolean SignedUp=signUpResult==SignUpResult.USER_CREATED_SUCCESSFULLY;
-
-        return SignedUp||cancelled;
-    }
-
-    public LoginResult logInPrompt() {
-
-        String username,pwd;
-        System.out.println("==Log In==");
-        System.out.println("==To Go back type 0 in either the password or the username==");
-        System.out.print("Username : ");
-        username=scanner.nextLine();
-        System.out.print("Password : ");
-
-        pwd=scanner.nextLine();
-
-
-        return userService.validateLoginCredentials(username, pwd);
-    }
-    public SignUpResult createAccountPrompt() {
-
-        String username,pwd,email;
-        System.out.println("==Create Account==");
-        System.out.println("==To Go back type 0 in either the password or the username==");
-        System.out.print("Username : ");
-        username=scanner.nextLine();
-        System.out.print("Password : ");
-        pwd=scanner.nextLine();
-        System.out.print("Email : ");
-        email=scanner.nextLine();
-
-        return userService.validateCreateAccountCredentials(username, pwd,email);
+        return signUpResult == SignUpResult.CANCEL_SIGNUP ||
+                signUpResult == SignUpResult.USER_CREATED_SUCCESSFULLY;
     }
 
     private boolean exitLogin(LoginResult loginResult) {
-        boolean cancelled=loginResult==LoginResult.CANCEL_LOGIN;
-        boolean loggedIn=loginResult==LoginResult.USER_FOUND_SUCCESSFULLY;
+        return loginResult == LoginResult.CANCEL_LOGIN ||
+                loginResult == LoginResult.USER_FOUND_SUCCESSFULLY;
+    }
 
-        return loggedIn||cancelled;
+    private LoginResult logInPrompt() {
+        logger.info("==Log In==");
+        logger.info("==To go back type 0 in either the password or the username==");
+        logger.info("Username : ");
+        String username = scanner.nextLine().trim();
+        logger.info("Password : ");
+        String pwd = scanner.nextLine().trim();
+        return userService.validateLoginCredentials(username, pwd);
+    }
+
+    private SignUpResult createAccountPrompt() {
+        logger.info("==Create Account==");
+        logger.info("==To go back type 0 in either the password or the username==");
+        logger.info("Username : ");
+        String username = scanner.nextLine().trim();
+        logger.info("Password : ");
+        String pwd = scanner.nextLine().trim();
+        logger.info("Email : ");
+        String email = scanner.nextLine().trim();
+        return userService.validateCreateAccountCredentials(username, pwd, email);
     }
 }
