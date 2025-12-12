@@ -39,31 +39,25 @@ public class EmailNotifier implements Observer {
      */
     public EmailNotifier() {
         Dotenv dotenv = Dotenv.configure()
-                .ignoreIfMissing() // don't crash if .env is missing
+                .ignoreIfMissing()
                 .load();
 
         this.smtpHost = dotenv.get("SMTP_HOST");
+
         String smtpPortString = dotenv.get("SMTP_PORT");
-        logger.info("SMTP port: " + smtpPortString);
-
-        int port = 0;
-        if (smtpPortString != null) {
-            try {
-                port = Integer.parseInt(smtpPortString);
-            } catch (NumberFormatException _) {
-                logger.warning("Invalid SMTP_PORT value: " + smtpPortString);
+        int parsedPort = -1;
+        try {
+            if (smtpPortString != null) {
+                parsedPort = Integer.parseInt(smtpPortString);
             }
+        } catch (NumberFormatException _) {
+            logger.warning("Invalid SMTP_PORT value, disabling SMTP");
         }
-        this.smtpPort = port;
+        this.smtpPort = parsedPort;
 
-        username = dotenv.get("SMTP_USERNAME");
+        this.username = dotenv.get("SMTP_USERNAME");
         this.password = dotenv.get("SMTP_PASSWORD");
         this.fromAddress = dotenv.get("SMTP_FROM");
-        logger.info("SMTP host: " + smtpHost);
-        logger.info("SMTP port: " + smtpPort);
-        logger.info("SMTP username: " + username);
-        logger.info("SMTP password: " + password);
-        logger.info("SMTP FROM: " + fromAddress);
 
         if (!isSmtpConfigured()) {
             logger.warning("EmailNotifier: SMTP not fully configured (.env missing or incomplete). " +
@@ -72,10 +66,23 @@ public class EmailNotifier implements Observer {
     }
 
     /**
-     * Full SMTP constructor (optional):
-     * use this when you want to pass SMTP config manually (e.g. from tests).
+     * Full SMTP constructor:
+     * Used mainly for tests to force SMTP configuration
+     * without relying on environment variables.
      */
+    public EmailNotifier(String smtpHost, int smtpPort,
+                         String username, String password,
+                         String fromAddress) {
+        this.smtpHost = smtpHost;
+        this.smtpPort = smtpPort;
+        this.username = username;
+        this.password = password;
+        this.fromAddress = fromAddress;
 
+        if (!isSmtpConfigured()) {
+            logger.warning("EmailNotifier: SMTP not fully configured (manual config incomplete).");
+        }
+    }
     private boolean isSmtpConfigured() {
         return smtpHost != null &&
                 smtpPort > 0 &&
@@ -103,7 +110,7 @@ public class EmailNotifier implements Observer {
             return;
         }
 
-        sendEmail(user.getEmail(), "Library notification", message);
+        sendEmail(user.getEmail(), message);
     }
 
     /**
@@ -118,36 +125,51 @@ public class EmailNotifier implements Observer {
     /**
      * Sends an email using Jakarta Mail and the configured SMTP settings.
      */
-    private void sendEmail(String to, String subject, String body) {
+    private void sendEmail(String to, String body) {
         try {
             Properties props = new Properties();
             props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "true"); // TLS
+            props.put("mail.smtp.starttls.enable", "true");
             props.put("mail.smtp.host", smtpHost);
             props.put("mail.smtp.port", String.valueOf(smtpPort));
 
-            Session session = Session.getInstance(
-                    props,
-                    new Authenticator() {
-                        @Override
-                        protected PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(username, password);
-                        }
-                    }
-            );
+            Session session = createSession(props);
 
             Message msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress(fromAddress));
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-            msg.setSubject(subject);
+            msg.setSubject("Library notification");
             msg.setText(body);
 
-            Transport.send(msg);
-            String logToLog="Email sent successfully to " + to;
-            logger.info(logToLog);
+            doSend(msg);
+            String toLog="Email sent successfully to " + to;
+            logger.info(toLog);
         } catch (MessagingException e) {
-            String logToLog="Failed to send email to " + to;
-            logger.log(Level.SEVERE, logToLog, e);
+            String toLog="Failed to send email to " + to;
+            logger.log(Level.SEVERE, toLog, e);
         }
+    }
+
+
+    /**
+     * Creates a JavaMail Session. Extracted for testability.
+     */
+    protected Session createSession(Properties props) {
+        return Session.getInstance(
+                props,
+                new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                }
+        );
+    }
+
+    /**
+     * Sends a prepared MimeMessage. Extracted for testability.
+     */
+    protected void doSend(Message msg) throws MessagingException {
+        Transport.send(msg);
     }
 }
