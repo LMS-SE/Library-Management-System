@@ -1,56 +1,43 @@
 package edu.software.lms;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+import org.junit.jupiter.params.provider.Arguments;
 
 class UserServiceCoverageTest {
-
-    @Test
-    void createAdmin_returnsEarly_whenUsernameIsZero() {
+    @ParameterizedTest(name = "createAdmin returns early for username={0}, pwd={1}")
+    @MethodSource("createAdminEarlyReturnCases")
+    void createAdmin_returnsEarly_forInvalidInputs(String username, String pwd, String email) {
         UserRepository repo = mock(UserRepository.class);
         UserService us = new UserService();
         us.setUserRepository(repo);
 
-        us.createAdmin("0", "ADMIN@123A", "a@a.com");
+        us.createAdmin(username, pwd, email);
 
         verifyNoInteractions(repo);
     }
 
-    @Test
-    void createAdmin_returnsEarly_whenPwdIsZero() {
-        UserRepository repo = mock(UserRepository.class);
-        UserService us = new UserService();
-        us.setUserRepository(repo);
-
-        us.createAdmin("admin2", "0", "a@a.com");
-
-        verifyNoInteractions(repo);
+    static Stream<Arguments> createAdminEarlyReturnCases() {
+        return Stream.of(
+                arguments("0", "ADMIN@123A", "a@a.com"),   // username == "0"
+                arguments("admin2", "0", "a@a.com"),       // pwd == "0"
+                arguments("admin2", "Ab@1", "a@a.com"),    // too short
+                arguments("admin2", "Password1", "a@a.com")// not strong (no symbol)
+        );
     }
 
-    @Test
-    void createAdmin_returnsEarly_whenPwdTooShort() {
-        UserRepository repo = mock(UserRepository.class);
-        UserService us = new UserService();
-        us.setUserRepository(repo);
 
-        us.createAdmin("admin2", "Ab@1", "a@a.com");
 
-        verifyNoInteractions(repo);
-    }
 
-    @Test
-    void createAdmin_returnsEarly_whenPwdNotStrong() {
-        UserRepository repo = mock(UserRepository.class);
-        UserService us = new UserService();
-        us.setUserRepository(repo);
 
-        // 8+ chars but not strong (no symbol etc.)
-        us.createAdmin("admin2", "Password1", "a@a.com");
 
-        verifyNoInteractions(repo);
-    }
+
 
     @Test
     void createAdmin_setsCurrentUser_whenRepoAddsUserSuccessfully() {
