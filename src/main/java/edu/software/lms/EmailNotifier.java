@@ -43,11 +43,17 @@ public class EmailNotifier implements Observer {
                 .load();
 
         this.smtpHost = dotenv.get("SMTP_HOST");
-        String portStr = dotenv.get("SMTP_PORT");
-        this.smtpPort = portStr != null ? Integer.parseInt(portStr) : -1;
-        this.username = dotenv.get("SMTP_USERNAME");
+        String smtpPortString = dotenv.get("SMTP_PORT");
+        logger.info("SMTP port: " + smtpPortString);
+        this.smtpPort = Integer.parseInt(smtpPortString);
+        username = dotenv.get("SMTP_USERNAME");
         this.password = dotenv.get("SMTP_PASSWORD");
         this.fromAddress = dotenv.get("SMTP_FROM");
+        logger.info("SMTP host: " + smtpHost);
+        logger.info("SMTP port: " + smtpPort);
+        logger.info("SMTP username: " + username);
+        logger.info("SMTP password: " + password);
+        logger.info("SMTP FROM: " + fromAddress);
 
         if (!isSmtpConfigured()) {
             logger.warning("EmailNotifier: SMTP not fully configured (.env missing or incomplete). " +
@@ -59,17 +65,6 @@ public class EmailNotifier implements Observer {
      * Full SMTP constructor (optional):
      * use this when you want to pass SMTP config manually (e.g. from tests).
      */
-    public EmailNotifier(String smtpHost,
-                         int smtpPort,
-                         String username,
-                         String password,
-                         String fromAddress) {
-        this.smtpHost = smtpHost;
-        this.smtpPort = smtpPort;
-        this.username = username;
-        this.password = password;
-        this.fromAddress = fromAddress;
-    }
 
     private boolean isSmtpConfigured() {
         return smtpHost != null &&

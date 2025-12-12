@@ -20,14 +20,6 @@ public class AdminBookOperationsWindow implements Window {
     private final BorrowingService borrowingService;
 
     /**
-     * Sets the scanner instance (used in tests).
-     *
-     * @param testScanner scanner to inject for testing
-     */
-    static void setScanner(Scanner testScanner) {
-        scanner = testScanner;
-    }
-    /**
      * Constructs a new admin operations window.
      *
      * @param userService the user service providing repositories and authentication context

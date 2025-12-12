@@ -51,8 +51,6 @@ public class User {
     /** @return hashed password */
     public String getPassword() { return password; }
 
-    /** Updates the password (already hashed). */
-    public void setPassword(String password) { this.password = password; }
 
     /** @return user ID */
     public String getId() { return id; }
@@ -63,16 +61,11 @@ public class User {
     /** @return user’s email address */
     public String getEmail() { return email; }
 
-    /** Updates the email address. */
-    public void setEmail(String email) { this.email = email; }
 
     /** @return true if the user is an administrator */
     public boolean isAdmin() { return isAdmin; }
 
-    /** Sets admin status. */
-    public void setAdmin(boolean admin) { isAdmin = admin; }
 
-    // ------------------- Fine Handling -------------------
 
     /**
      * @return current unpaid fine balance
