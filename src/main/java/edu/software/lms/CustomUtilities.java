@@ -74,21 +74,4 @@ public class CustomUtilities {
         }
     }
 
-    /**
-     * Custom exception for password hashing failures.
-     * <p>This is currently unused but may be useful if hashing
-     * is reworked to support exception handling.</p>
-     */
-    public static class HashingException extends Exception {
-
-        /**
-         * Constructs a new hashing exception.
-         *
-         * @param message explanation of the error
-         * @param cause underlying exception
-         */
-        public HashingException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
 }

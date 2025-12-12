@@ -18,14 +18,6 @@ public class CDFineStrategy implements FineStrategy {
         this.perDay = 20; // default CD fine per day
     }
 
-    /**
-     * Creates a CDFineStrategy with a custom overdue fine rate.
-     *
-     * @param perDay fine amount to apply for every overdue day
-     */
-    public CDFineStrategy(int perDay) {
-        this.perDay = perDay;
-    }
 
     /**
      * Computes the fine for a given overdue duration.
