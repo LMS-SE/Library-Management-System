@@ -45,7 +45,17 @@ public class EmailNotifier implements Observer {
         this.smtpHost = dotenv.get("SMTP_HOST");
         String smtpPortString = dotenv.get("SMTP_PORT");
         logger.info("SMTP port: " + smtpPortString);
-        this.smtpPort = Integer.parseInt(smtpPortString);
+
+        int port = 0;
+        if (smtpPortString != null) {
+            try {
+                port = Integer.parseInt(smtpPortString);
+            } catch (NumberFormatException _) {
+                logger.warning("Invalid SMTP_PORT value: " + smtpPortString);
+            }
+        }
+        this.smtpPort = port;
+
         username = dotenv.get("SMTP_USERNAME");
         this.password = dotenv.get("SMTP_PASSWORD");
         this.fromAddress = dotenv.get("SMTP_FROM");
