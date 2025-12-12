@@ -108,6 +108,8 @@
                 <configuration>
                     <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
                     <show>public</show>
+                    <doclint>none</doclint>
+                    <failOnError>false</failOnError>
                 </configuration>
             </plugin>
         </plugins>

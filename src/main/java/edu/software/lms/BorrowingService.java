@@ -7,18 +7,19 @@ import java.util.List;
  * for books. This includes loan creation, overdue checking, fine calculation,
  * fine payment, and integration with {@link ReminderService} for sending overdue notifications.
  *
- * <p>The service coordinates interactions between:
+ * <p>The service coordinates interactions between:</p>
  * <ul>
  *     <li>{@link UserRepository}</li>
  *     <li>{@link BookRepository}</li>
  *     <li>{@link LoanRepository}</li>
  *     <li>{@link TimeProvider}</li>
  *     <li>{@link FineCalculator}</li>
- * </ul></p>
+ * </ul>
  *
  * <p>This service is focused on books, while {@link MediaBorrowingService}
  * provides media-type handling for CDs and books together.</p>
  */
+
 public class BorrowingService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
@@ -63,7 +64,7 @@ public class BorrowingService {
     /**
      * Attempts to borrow a book for a given user and book ID.
      *
-     * <p>Borrowing fails under any of these conditions:
+     * <p>Borrowing fails under any of these conditions:</p>
      * <ul>
      *     <li>User does not exist</li>
      *     <li>User has outstanding fines</li>
@@ -71,7 +72,6 @@ public class BorrowingService {
      *     <li>Book does not exist</li>
      *     <li>Book is already borrowed</li>
      * </ul>
-     * </p>
      *
      * <p>If successful, a new {@link Loan} is created and persisted.</p>
      *
@@ -112,7 +112,7 @@ public class BorrowingService {
     /**
      * Attempts to return a book associated with a given loan ID.
      *
-     * <p>Returning triggers the following steps:
+     * <p>Returning triggers the following steps:</p>
      * <ul>
      *     <li>Loan is marked as returned</li>
      *     <li>Fine is calculated if overdue</li>
@@ -120,7 +120,6 @@ public class BorrowingService {
      *     <li>The underlying book is marked as not borrowed</li>
      *     <li>The loan is updated in the repository</li>
      * </ul>
-     * </p>
      *
      * @param loanId ID of loan to return
      * @return a {@link Pair} containing success flag and message

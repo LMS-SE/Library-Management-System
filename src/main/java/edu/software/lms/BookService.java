@@ -79,7 +79,7 @@ public final class BookService {
      * Prints the details of a given {@link Book} or {@link CD} in a formatted style.
      * If the book is null, a "No result found" message is displayed.
      *
-     * <p>The output includes:
+     * <p>The output includes:</p>
      * <ul>
      *     <li>ID</li>
      *     <li>Type (Book or CD)</li>
@@ -87,7 +87,7 @@ public final class BookService {
      *     <li>Author</li>
      *     <li>ISBN</li>
      *     <li>Borrowed status</li>
-     * </ul></p>
+     * </ul>
      *
      * @param b the book to print, or null if no book was found
      */
